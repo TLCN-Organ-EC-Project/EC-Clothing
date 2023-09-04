@@ -10,16 +10,26 @@ import (
 
 type Querier interface {
 	ChangeUserPassword(ctx context.Context, arg ChangeUserPasswordParams) (User, error)
+	CreateImgProduct(ctx context.Context, arg CreateImgProductParams) (ImgsProduct, error)
+	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
 	CreatePromotion(ctx context.Context, arg CreatePromotionParams) (Promotion, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteImgProduct(ctx context.Context, id int64) error
+	DeleteProduct(ctx context.Context, id int64) error
 	DeletePromotion(ctx context.Context, id int64) error
 	DeleteUser(ctx context.Context, username string) error
+	GetImgProduct(ctx context.Context, id int64) (ImgsProduct, error)
+	GetProduct(ctx context.Context, productName string) (Product, error)
 	GetPromotion(ctx context.Context, title string) (Promotion, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByResetPassToken(ctx context.Context, resetPasswordToken string) (User, error)
+	ListImgProducts(ctx context.Context, arg ListImgProductsParams) ([]ImgsProduct, error)
+	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	ListPromotions(ctx context.Context, arg ListPromotionsParams) ([]Promotion, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	UpdateImgProduct(ctx context.Context, arg UpdateImgProductParams) (ImgsProduct, error)
+	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 	UpdatePromotion(ctx context.Context, arg UpdatePromotionParams) (Promotion, error)
 	UpdateResetPasswordToken(ctx context.Context, arg UpdateResetPasswordTokenParams) (User, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
