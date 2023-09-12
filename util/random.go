@@ -45,3 +45,7 @@ func RandonEmail() string {
 func RandomProvince() int64 {
 	return RandomInt(1, 63)
 }
+
+func RandomResetPasswordToken() string {
+	return RandomString(5, numbers)
+}

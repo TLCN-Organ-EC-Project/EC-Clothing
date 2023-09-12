@@ -6,28 +6,39 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	ChangeUserPassword(ctx context.Context, arg ChangeUserPasswordParams) (User, error)
+	CreateFeedback(ctx context.Context, arg CreateFeedbackParams) (Feedback, error)
 	CreateImgProduct(ctx context.Context, arg CreateImgProductParams) (ImgsProduct, error)
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
 	CreatePromotion(ctx context.Context, arg CreatePromotionParams) (Promotion, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteFeedback(ctx context.Context, id int64) error
 	DeleteImgProduct(ctx context.Context, id int64) error
 	DeleteProduct(ctx context.Context, id int64) error
 	DeletePromotion(ctx context.Context, id int64) error
 	DeleteUser(ctx context.Context, username string) error
+	GetFeedback(ctx context.Context, id int64) (Feedback, error)
 	GetImgProduct(ctx context.Context, id int64) (ImgsProduct, error)
-	GetProduct(ctx context.Context, productName string) (Product, error)
+	GetProduct(ctx context.Context, id int64) (Product, error)
 	GetPromotion(ctx context.Context, title string) (Promotion, error)
+	GetProvince(ctx context.Context, name string) (Province, error)
+	GetRole(ctx context.Context, name string) (Role, error)
+	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetUser(ctx context.Context, username string) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByResetPassToken(ctx context.Context, resetPasswordToken string) (User, error)
+	ListFeedbacks(ctx context.Context, arg ListFeedbacksParams) ([]Feedback, error)
 	ListImgProducts(ctx context.Context, arg ListImgProductsParams) ([]ImgsProduct, error)
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	ListPromotions(ctx context.Context, arg ListPromotionsParams) ([]Promotion, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	UpdateFeedback(ctx context.Context, arg UpdateFeedbackParams) (Feedback, error)
 	UpdateImgProduct(ctx context.Context, arg UpdateImgProductParams) (ImgsProduct, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 	UpdatePromotion(ctx context.Context, arg UpdatePromotionParams) (Promotion, error)

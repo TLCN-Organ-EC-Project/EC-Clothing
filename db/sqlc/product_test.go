@@ -10,10 +10,10 @@ import (
 )
 
 func createRandomProduct(t *testing.T) Product {
-	arg := CreateProductParams {
+	arg := CreateProductParams{
 		ProductName: util.RandomOwner(),
-		Thumb: util.RandomOwner(),
-		Price: float64(util.RandomInt(20, 50)),
+		Thumb:       util.RandomOwner(),
+		Price:       float64(util.RandomInt(20, 50)),
 	}
 
 	product, err := testQueries.CreateProduct(context.Background(), arg)
@@ -33,24 +33,24 @@ func TestCreateProduct(t *testing.T) {
 
 func TestGetProduct(t *testing.T) {
 	product1 := createRandomProduct(t)
-	product2, err := testQueries.GetProduct(context.Background(), product1.ProductName)
+	product2, err := testQueries.GetProduct(context.Background(), product1.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, product2)
 
 	require.Equal(t, product1.ProductName, product2.ProductName)
 	require.Equal(t, product1.Thumb, product2.Thumb)
-	require.Equal(t, product1.Price, product2.Price)	
+	require.Equal(t, product1.Price, product2.Price)
 }
 
 func TestListProducts(t *testing.T) {
 
-	for i:=0; i<5; i++ {
+	for i := 0; i < 5; i++ {
 		createRandomProduct(t)
 	}
-	
-	arg := ListProductsParams {
-		Limit: 5,
+
+	arg := ListProductsParams{
+		Limit:  5,
 		Offset: 5,
 	}
 
@@ -68,11 +68,11 @@ func TestListProducts(t *testing.T) {
 func TestUpdateProduct(t *testing.T) {
 	product1 := createRandomProduct(t)
 
-	arg := UpdateProductParams {
-		ID: product1.ID,
+	arg := UpdateProductParams{
+		ID:          product1.ID,
 		ProductName: util.RandomOwner(),
-		Thumb: util.RandomOwner(),
-		Price: float64(util.RandomInt(2, 50)),
+		Thumb:       util.RandomOwner(),
+		Price:       float64(util.RandomInt(2, 50)),
 	}
 
 	product2, err := testQueries.UpdateProduct(context.Background(), arg)
@@ -90,7 +90,7 @@ func TestDeleteProduct(t *testing.T) {
 	err := testQueries.DeleteProduct(context.Background(), product1.ID)
 	require.NoError(t, err)
 
-	product2, err := testQueries.GetProduct(context.Background(), product1.ProductName)
+	product2, err := testQueries.GetProduct(context.Background(), product1.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, product2)

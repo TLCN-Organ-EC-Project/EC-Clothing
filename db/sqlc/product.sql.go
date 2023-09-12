@@ -48,11 +48,11 @@ func (q *Queries) DeleteProduct(ctx context.Context, id int64) error {
 
 const getProduct = `-- name: GetProduct :one
 SELECT id, product_name, thumb, price FROM products
-WHERE product_name = $1 LIMIT 1
+WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetProduct(ctx context.Context, productName string) (Product, error) {
-	row := q.db.QueryRowContext(ctx, getProduct, productName)
+func (q *Queries) GetProduct(ctx context.Context, id int64) (Product, error) {
+	row := q.db.QueryRowContext(ctx, getProduct, id)
 	var i Product
 	err := row.Scan(
 		&i.ID,

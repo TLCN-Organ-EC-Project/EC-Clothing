@@ -1,0 +1,918 @@
+definitions:
+  api.checkPasswordRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+    required:
+    - password
+    type: object
+  api.createFeedbackRequest:
+    properties:
+      commention:
+        type: string
+      rating:
+        type: string
+    required:
+    - commention
+    - rating
+    type: object
+  api.createUserRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone:
+        type: string
+      province:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    required:
+    - address
+    - email
+    - full_name
+    - password
+    - phone
+    - province
+    - role
+    - username
+    type: object
+  api.forgotPasswordRequest:
+    properties:
+      email:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - username
+    type: object
+  api.listFeedbackResponse:
+    properties:
+      feedbacks:
+        items:
+          properties:
+            commentor:
+              $ref: '#/definitions/api.userResponse'
+            feedback:
+              $ref: '#/definitions/db.Feedback'
+          type: object
+        type: array
+    type: object
+  api.loginUserRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  api.loginUserResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+      refresh_token:
+        type: string
+      refresh_token_expires_at:
+        type: string
+      session_id:
+        type: string
+      user:
+        $ref: '#/definitions/api.userResponse'
+    type: object
+  api.newPasswordRequest:
+    properties:
+      first_password:
+        minLength: 6
+        type: string
+      original_password:
+        minLength: 6
+        type: string
+      second_password:
+        minLength: 6
+        type: string
+    required:
+    - first_password
+    - original_password
+    - second_password
+    type: object
+  api.resetPasswordRequest:
+    properties:
+      first_password:
+        minLength: 6
+        type: string
+      otpcode:
+        type: string
+      second_password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - first_password
+    - otpcode
+    - second_password
+    - username
+    type: object
+  api.updateUserRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      phone:
+        type: string
+      province:
+        type: string
+    type: object
+  api.userResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      password_changed_at:
+        type: string
+      phone:
+        type: string
+      province:
+        type: integer
+      role:
+        type: integer
+      username:
+        type: string
+    type: object
+  db.Feedback:
+    properties:
+      commention:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      product_commented:
+        type: integer
+      rating:
+        type: string
+      user_comment:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a sample server celler server.
+  title: Service API
+  version: "1.0"
+paths:
+  /api/admin/users/:
+    get:
+      consumes:
+      - application/json
+      operationId: listUser
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 10
+        minimum: 5
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.userResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Get List User
+      tags:
+      - Admin
+  /api/admin/users/{username}:
+    delete:
+      consumes:
+      - application/json
+      operationId: deleteUser
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Delete User
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      operationId: adminGetUserByUsername
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.userResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Get User By Username
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      operationId: adminUpdateUser
+      parameters:
+      - description: updateUserRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateUserRequest'
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.userResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Update User
+      tags:
+      - Admin
+  /api/admin/users/{username}/feedbacks/{product_commented}/{id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: adminDeleteFeedback
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: UserComment
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: ProductCommented
+        in: path
+        name: product_commented
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Delete Feedback
+      tags:
+      - Admin
+  /api/forgotpassword:
+    post:
+      consumes:
+      - application/json
+      operationId: sendResetPasswordToken
+      parameters:
+      - description: forgotPasswordRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.forgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Send Reset Password Token
+      tags:
+      - Started
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      operationId: loginUser
+      parameters:
+      - description: loginUserRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.loginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.loginUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login user
+      tags:
+      - Started
+  /api/products/{id}/feedbacks:
+    get:
+      consumes:
+      - application/json
+      operationId: listFeedbackByID
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 10
+        name: page_size
+        required: true
+        type: integer
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.listFeedbackResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Get List Feedback About Product
+      tags:
+      - User
+  /api/register:
+    post:
+      consumes:
+      - application/json
+      operationId: createUser
+      parameters:
+      - description: createUserRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.userResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create user
+      tags:
+      - Started
+  /api/resetpassword:
+    post:
+      consumes:
+      - application/json
+      operationId: resetPassword
+      parameters:
+      - description: resetPasswordRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.resetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Reset Password
+      tags:
+      - Started
+  /api/users/{username}:
+    get:
+      consumes:
+      - application/json
+      operationId: getUserByUsername
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.userResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Get User By Username
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      operationId: updateUser
+      parameters:
+      - description: updateUserRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateUserRequest'
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.userResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Update User
+      tags:
+      - User
+  /api/users/{username}/change:
+    post:
+      consumes:
+      - application/json
+      operationId: changePassword
+      parameters:
+      - description: newPasswordRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.newPasswordRequest'
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Change Password
+      tags:
+      - User
+  /api/users/{username}/check:
+    post:
+      consumes:
+      - application/json
+      operationId: checkPassword
+      parameters:
+      - description: checkPasswordRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.checkPasswordRequest'
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Check Password
+      tags:
+      - User
+  /api/users/{username}/feedbacks/{product_commented}:
+    post:
+      consumes:
+      - application/json
+      operationId: createFeedback
+      parameters:
+      - description: createFeedbackRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createFeedbackRequest'
+      - description: UserComment
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: ProductCommented
+        in: path
+        name: product_commented
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Feedback'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Create Feedback
+      tags:
+      - User
+  /api/users/{username}/feedbacks/{product_commented}/{id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: deleteFeedback
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: UserComment
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: ProductCommented
+        in: path
+        name: product_commented
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Delete Feedback
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      operationId: updateFeedback
+      parameters:
+      - description: createFeedbackRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createFeedbackRequest'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: UserComment
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: ProductCommented
+        in: path
+        name: product_commented
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Feedback'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Update Feedback
+      tags:
+      - User
+securityDefinitions:
+  bearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

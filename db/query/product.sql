@@ -9,7 +9,7 @@ INSERT INTO products (
 
 -- name: GetProduct :one
 SELECT * FROM products
-WHERE product_name = $1 LIMIT 1;
+WHERE id = $1 LIMIT 1;
 
 -- name: ListProducts :many
 SELECT * FROM products
