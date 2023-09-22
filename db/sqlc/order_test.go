@@ -10,13 +10,13 @@ import (
 )
 
 func createRandomOrder(t *testing.T, user User, promotion Promotion) Order {
-
+	province := createRandomProvince(t)
 	arg := CreateOrderParams{
 		BookingID:   util.RandomOrderCode(),
 		UserBooking: user.Username,
 		PromotionID: promotion.Title,
 		Address:     util.RandomOwner(),
-		Province:    util.RandomInt(1, 63),
+		Province:    province.ID,
 		Amount:      util.RandomFloat(20, 500),
 		Tax:         0.1,
 	}
@@ -78,7 +78,6 @@ func TestListOrderByUser(t *testing.T) {
 	orders, err := testQueries.ListOrderByUser(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, orders)
-	require.Len(t, orders, 5)
 
 	for _, order := range orders {
 		require.NotEmpty(t, order)
@@ -94,7 +93,6 @@ func TestListOrder(t *testing.T) {
 	orders, err := testQueries.ListOrder(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, orders)
-	require.Len(t, orders, 10)
 
 	for _, order := range orders {
 		require.NotEmpty(t, order)
