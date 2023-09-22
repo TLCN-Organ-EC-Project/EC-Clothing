@@ -30,4 +30,7 @@ server:
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
-.PHONY: postgres createdb dropdb migrateup migratedown gen new_migration
+test:
+	go test -v -cover ./...
+
+.PHONY: postgres createdb dropdb migrateup migratedown gen new_migration test

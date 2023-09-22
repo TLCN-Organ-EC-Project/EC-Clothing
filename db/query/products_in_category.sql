@@ -8,7 +8,7 @@ INSERT INTO products_in_category (
 
 -- name: GetProductsInCategoryByID :one
 SELECT * FROM products_in_category
-WHERE id = $1 LIMIT 1;
+WHERE category_id = $1 AND product_id = $2 LIMIT 1;
 
 -- name: ListProductsInCategory :many
 SELECT * FROM products_in_category

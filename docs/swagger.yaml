@@ -1,4 +1,28 @@
 definitions:
+  api.addImageProductRequest:
+    properties:
+      images:
+        items:
+          type: string
+        type: array
+    required:
+    - images
+    type: object
+  api.addProductToStoreRequest:
+    properties:
+      quantity:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      size:
+        items:
+          type: string
+        type: array
+    required:
+    - quantity
+    - size
+    type: object
   api.checkPasswordRequest:
     properties:
       password:
@@ -6,6 +30,13 @@ definitions:
         type: string
     required:
     - password
+    type: object
+  api.createCategoryRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
     type: object
   api.createFeedbackRequest:
     properties:
@@ -16,6 +47,73 @@ definitions:
     required:
     - commention
     - rating
+    type: object
+  api.createProductInCategoryRequest:
+    properties:
+      product_id:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+    required:
+    - product_id
+    type: object
+  api.createProductRequest:
+    properties:
+      gender:
+        type: string
+      material:
+        type: string
+      price:
+        type: number
+      product_name:
+        type: string
+      size:
+        type: string
+      size_of_model:
+        type: string
+      thumb:
+        type: string
+    required:
+    - gender
+    - material
+    - price
+    - product_name
+    - size
+    - size_of_model
+    - thumb
+    type: object
+  api.createProductResponse:
+    properties:
+      gender:
+        type: string
+      material:
+        type: string
+      price:
+        type: number
+      product_name:
+        type: string
+      size:
+        type: string
+      size_of_model:
+        type: string
+      thumb:
+        type: string
+    type: object
+  api.createPromotionRequest:
+    properties:
+      description:
+        type: string
+      discount_percent:
+        type: number
+      end_date:
+        type: integer
+      title:
+        type: string
+    required:
+    - description
+    - end_date
+    - title
     type: object
   api.createUserRequest:
     properties:
@@ -55,6 +153,28 @@ definitions:
     required:
     - email
     - username
+    type: object
+  api.getProductByNameResponse:
+    properties:
+      product:
+        items:
+          properties:
+            descriptions_product:
+              $ref: '#/definitions/db.DescriptionsProduct'
+            images:
+              items:
+                $ref: '#/definitions/db.ImgsProduct'
+              type: array
+            list_of_feedbacks:
+              $ref: '#/definitions/api.listFeedbackResponse'
+            product:
+              $ref: '#/definitions/db.Product'
+            stores:
+              items:
+                $ref: '#/definitions/db.Store'
+              type: array
+          type: object
+        type: array
     type: object
   api.listFeedbackResponse:
     properties:
@@ -110,6 +230,21 @@ definitions:
     - original_password
     - second_password
     type: object
+  api.promotionResponse:
+    properties:
+      description:
+        type: string
+      discount_percent:
+        type: number
+      end_date:
+        type: string
+      id:
+        type: integer
+      start_date:
+        type: string
+      title:
+        type: string
+    type: object
   api.resetPasswordRequest:
     properties:
       first_password:
@@ -127,6 +262,26 @@ definitions:
     - otpcode
     - second_password
     - username
+    type: object
+  api.updateCategoryRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  api.updatePromotionRequest:
+    properties:
+      description:
+        type: string
+      discount_percent:
+        type: number
+      end_date:
+        type: integer
+    required:
+    - description
+    - discount_percent
+    - end_date
     type: object
   api.updateUserRequest:
     properties:
@@ -162,6 +317,28 @@ definitions:
       username:
         type: string
     type: object
+  db.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  db.DescriptionsProduct:
+    properties:
+      gender:
+        type: string
+      id:
+        type: integer
+      material:
+        type: string
+      product_id:
+        type: integer
+      size:
+        type: string
+      size_of_model:
+        type: string
+    type: object
   db.Feedback:
     properties:
       commention:
@@ -177,12 +354,589 @@ definitions:
       user_comment:
         type: string
     type: object
+  db.ImgsProduct:
+    properties:
+      id:
+        type: integer
+      image:
+        type: string
+      product_id:
+        type: integer
+    type: object
+  db.Product:
+    properties:
+      id:
+        type: integer
+      price:
+        type: number
+      product_name:
+        type: string
+      thumb:
+        type: string
+    type: object
+  db.ProductsInCategory:
+    properties:
+      category_id:
+        type: integer
+      id:
+        type: integer
+      product_id:
+        type: integer
+    type: object
+  db.Promotion:
+    properties:
+      description:
+        type: string
+      discount_percent:
+        type: number
+      end_date:
+        type: string
+      id:
+        type: integer
+      start_date:
+        type: string
+      title:
+        type: string
+    type: object
+  db.Store:
+    properties:
+      id:
+        type: integer
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      size:
+        type: string
+    type: object
 info:
   contact: {}
   description: This is a sample server celler server.
   title: Service API
   version: "1.0"
 paths:
+  /api/admin/categories:
+    post:
+      consumes:
+      - application/json
+      operationId: createCategory
+      parameters:
+      - description: createCategoryRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Category'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      - bearerAuth: []
+      summary: Admin Create New Category
+      tags:
+      - Admin
+  /api/admin/categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: adminDeleteCategory
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Delete Category
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      operationId: updateCategory
+      parameters:
+      - description: updateCategoryRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateCategoryRequest'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Category'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      - bearerAuth: []
+      summary: Admin Update Category
+      tags:
+      - Admin
+  /api/admin/categories/{id}/products:
+    post:
+      consumes:
+      - application/json
+      operationId: adminCreateProductInCategory
+      parameters:
+      - description: createProductInCategoryRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createProductInCategoryRequest'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.ProductsInCategory'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Create Products In Category
+      tags:
+      - Admin
+  /api/admin/categories/{id}/products/{product_id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: adminDeleteProductInCategory
+      parameters:
+      - description: CategoryID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ProductID
+        in: path
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Delete Products In Category
+      tags:
+      - Admin
+  /api/admin/products:
+    post:
+      consumes:
+      - application/json
+      operationId: adminCreateProduct
+      parameters:
+      - description: createProductRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.createProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Create Product
+      tags:
+      - Admin
+  /api/admin/products/{id}:
+    post:
+      consumes:
+      - application/json
+      operationId: adminAddImageProduct
+      parameters:
+      - description: addImageProductRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.addImageProductRequest'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.ImgsProduct'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Add Image of Product
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      operationId: adminUpdateProduct
+      parameters:
+      - description: createProductRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createProductRequest'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.createProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Update Product
+      tags:
+      - Admin
+  /api/admin/products/{id}/store:
+    post:
+      consumes:
+      - application/json
+      operationId: adminAddProductToStore
+      parameters:
+      - description: addProductToStoreRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.addProductToStoreRequest'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Store'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Add Product To Store
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      operationId: adminUpdateProductToStore
+      parameters:
+      - description: addProductToStoreRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.addProductToStoreRequest'
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Store'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Update Product To Store
+      tags:
+      - Admin
+  /api/admin/promotions:
+    post:
+      consumes:
+      - application/json
+      operationId: createPromotion
+      parameters:
+      - description: createPromotionRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createPromotionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.promotionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Create Promotion
+      tags:
+      - Admin
+  /api/admin/promotions/{id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: deletePromotion
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Delete Promotion
+      tags:
+      - Admin
+  /api/admin/promotions/{title}:
+    put:
+      consumes:
+      - application/json
+      operationId: updatePromotion
+      parameters:
+      - description: updatePromotionRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.updatePromotionRequest'
+      - description: Title
+        in: path
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Promotion'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Update Promotion
+      tags:
+      - Admin
   /api/admin/users/:
     get:
       consumes:
@@ -392,6 +1146,120 @@ paths:
       summary: Admin Delete Feedback
       tags:
       - Admin
+  /api/categories:
+    get:
+      consumes:
+      - application/json
+      operationId: listCategory
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 10
+        minimum: 5
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/db.Category'
+              type: array
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get List Category
+      tags:
+      - Started
+  /api/categories/{id}:
+    get:
+      consumes:
+      - application/json
+      operationId: getCategory
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Category'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Category
+      tags:
+      - Started
+  /api/categories/{id}/products:
+    get:
+      consumes:
+      - application/json
+      operationId: getProductsInCategory
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 10
+        name: page_size
+        required: true
+        type: integer
+      - description: CategoryID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Products In Category
+      tags:
+      - Started
   /api/forgotpassword:
     post:
       consumes:
@@ -468,6 +1336,91 @@ paths:
       summary: Login user
       tags:
       - Started
+  /api/products:
+    get:
+      consumes:
+      - application/json
+      operationId: listProduct
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 10
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List Product
+      tags:
+      - Started
+  /api/products/{id}:
+    get:
+      consumes:
+      - application/json
+      operationId: getProductByID
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 10
+        name: page_size
+        required: true
+        type: integer
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.getProductByNameResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Product By ID
+      tags:
+      - Started
   /api/products/{id}/feedbacks:
     get:
       consumes:
@@ -512,6 +1465,103 @@ paths:
       summary: User Get List Feedback About Product
       tags:
       - User
+  /api/promotions:
+    get:
+      consumes:
+      - application/json
+      operationId: listPromotion
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 10
+        minimum: 5
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Promotion'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Get List Promotion
+      tags:
+      - User
+  /api/promotions/{title}:
+    get:
+      consumes:
+      - application/json
+      operationId: getPromotionByTitle
+      parameters:
+      - description: Title
+        in: path
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.promotionResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Get Promotion By Title
+      tags:
+      - User
+  /api/provinces:
+    get:
+      consumes:
+      - application/json
+      operationId: listProvinces
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              items:
+                type: string
+              type: array
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get List Provinces
+      tags:
+      - Started
   /api/register:
     post:
       consumes:
@@ -580,6 +1630,39 @@ paths:
       summary: Reset Password
       tags:
       - Started
+  /api/tokens/renew_access:
+    post:
+      operationId: renewAccessToken
+      parameters:
+      - description: X-Refresh-Token
+        in: header
+        name: X-Refresh-Token
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Renew Access Token
+      tags:
+      - Auth
   /api/users/{username}:
     get:
       consumes:

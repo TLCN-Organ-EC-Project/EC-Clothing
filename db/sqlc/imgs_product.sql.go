@@ -55,18 +55,10 @@ const listImgProducts = `-- name: ListImgProducts :many
 SELECT id, product_id, image FROM imgs_product
 WHERE product_id = $1
 ORDER BY id
-LIMIT $2
-OFFSET $3
 `
 
-type ListImgProductsParams struct {
-	ProductID int64 `json:"product_id"`
-	Limit     int32 `json:"limit"`
-	Offset    int32 `json:"offset"`
-}
-
-func (q *Queries) ListImgProducts(ctx context.Context, arg ListImgProductsParams) ([]ImgsProduct, error) {
-	rows, err := q.db.QueryContext(ctx, listImgProducts, arg.ProductID, arg.Limit, arg.Offset)
+func (q *Queries) ListImgProducts(ctx context.Context, productID int64) ([]ImgsProduct, error) {
+	rows, err := q.db.QueryContext(ctx, listImgProducts, productID)
 	if err != nil {
 		return nil, err
 	}

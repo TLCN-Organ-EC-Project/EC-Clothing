@@ -78,18 +78,10 @@ const listStore = `-- name: ListStore :many
 SELECT id, product_id, size, quantity FROM store
 WHERE product_id = $1
 ORDER BY id
-LIMIT $2
-OFFSET $3
 `
 
-type ListStoreParams struct {
-	ProductID int64 `json:"product_id"`
-	Limit     int32 `json:"limit"`
-	Offset    int32 `json:"offset"`
-}
-
-func (q *Queries) ListStore(ctx context.Context, arg ListStoreParams) ([]Store, error) {
-	rows, err := q.db.QueryContext(ctx, listStore, arg.ProductID, arg.Limit, arg.Offset)
+func (q *Queries) ListStore(ctx context.Context, productID int64) ([]Store, error) {
+	rows, err := q.db.QueryContext(ctx, listStore, productID)
 	if err != nil {
 		return nil, err
 	}

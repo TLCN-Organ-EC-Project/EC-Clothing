@@ -33,7 +33,10 @@ func TestRandomProductsInCategory(t *testing.T) {
 func TestGetProductsInCategory(t *testing.T) {
 	category := createRandomCategory(t)
 	productincategory1 := createRandomProductsInCategory(t, category)
-	productincategory2, err := testQueries.GetProductsInCategoryByID(context.Background(), productincategory1.ID)
+	productincategory2, err := testQueries.GetProductsInCategoryByID(context.Background(), GetProductsInCategoryByIDParams{
+		CategoryID: productincategory1.CategoryID,
+		ProductID: productincategory1.ProductID,
+	})
 
 	require.NoError(t, err)
 	require.NotEmpty(t, productincategory2)
@@ -93,7 +96,10 @@ func TestDeleteProductsInCategory(t *testing.T) {
 	err := testQueries.DeleteProductsInCategory(context.Background(), productincategory1.ID)
 	require.NoError(t, err)
 
-	productincategory2, err := testQueries.GetProductsInCategoryByID(context.Background(), productincategory1.ID)
+	productincategory2, err := testQueries.GetProductsInCategoryByID(context.Background(), GetProductsInCategoryByIDParams{
+		CategoryID: productincategory1.CategoryID,
+		ProductID: productincategory1.ProductID,
+	})
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, productincategory2)

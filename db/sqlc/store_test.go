@@ -69,13 +69,8 @@ func TestListStore(t *testing.T) {
 		createRandomStore(t, product, size)
 	}
 
-	arg := ListStoreParams{
-		ProductID: product.ID,
-		Limit:     6,
-		Offset:    0,
-	}
 
-	stores, err := testQueries.ListStore(context.Background(), arg)
+	stores, err := testQueries.ListStore(context.Background(), product.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, stores)
 	require.Len(t, stores, 6)

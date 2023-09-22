@@ -41,11 +41,16 @@ func (q *Queries) DeleteProductsInCategory(ctx context.Context, id int64) error 
 
 const getProductsInCategoryByID = `-- name: GetProductsInCategoryByID :one
 SELECT id, category_id, product_id FROM products_in_category
-WHERE id = $1 LIMIT 1
+WHERE category_id = $1 AND product_id = $2 LIMIT 1
 `
 
-func (q *Queries) GetProductsInCategoryByID(ctx context.Context, id int64) (ProductsInCategory, error) {
-	row := q.db.QueryRowContext(ctx, getProductsInCategoryByID, id)
+type GetProductsInCategoryByIDParams struct {
+	CategoryID int64 `json:"category_id"`
+	ProductID  int64 `json:"product_id"`
+}
+
+func (q *Queries) GetProductsInCategoryByID(ctx context.Context, arg GetProductsInCategoryByIDParams) (ProductsInCategory, error) {
+	row := q.db.QueryRowContext(ctx, getProductsInCategoryByID, arg.CategoryID, arg.ProductID)
 	var i ProductsInCategory
 	err := row.Scan(&i.ID, &i.CategoryID, &i.ProductID)
 	return i, err

@@ -103,9 +103,7 @@ type listFeedbackResponse struct {
 		User        userResponse `json:"commentor"`
 	} `json:"feedbacks"`
 }
-type getProductRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
-}
+
 
 // @Summary User Get List Feedback About Product
 // @ID listFeedbackByID

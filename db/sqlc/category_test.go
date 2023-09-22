@@ -40,12 +40,8 @@ func TestListCategories(t *testing.T) {
 		createRandomCategory(t)
 	}
 
-	arg := ListCategoriesParams{
-		Limit:  5,
-		Offset: 1,
-	}
 
-	categories, err := testQueries.ListCategories(context.Background(), arg)
+	categories, err := testQueries.ListCategories(context.Background())
 	require.NoError(t, err)
 	require.NotEmpty(t, categories)
 	require.Len(t, categories, 5)

@@ -59,11 +59,21 @@ func (server *Server) setupRouter() {
 	api := router.Group("/api")
 
 	// login and register
-
 	api.POST("/register", server.createUser)
 	api.POST("/login", server.loginUser)
 	api.POST("/forgotpassword", server.sendResetPasswordToken)
 	api.POST("/resetpassword", server.resetPassword)
+	api.POST("/tokens/renew_access", server.renewAccessToken)
+	//category
+	api.GET("/categories", server.listCategory)
+	api.GET("/categories/:id", server.getCategory)
+	// province
+	api.GET("/provinces", server.listProvinces)
+	//product
+	api.GET("/products/:id", server.getProductByID)
+	api.GET("/products", server.listProduct)
+	// product in category
+	api.GET("/categories/:id/products", server.getProductsInCategory)
 
 	// -----------------------------------user--------------------------------
 	authUserRoutes := api.Group("/").Use(authMiddleware(server.tokenMaker))
@@ -78,6 +88,9 @@ func (server *Server) setupRouter() {
 	authUserRoutes.GET("/products/:id/feedbacks", server.listFeedbackByID)
 	authUserRoutes.PUT("/users/:username/feedbacks/:product_commented/:id", server.updateFeedback)
 	authUserRoutes.DELETE("/users/:username/feedbacks/:product_commented/:id", server.deleteFeedback)
+	//promotion
+	authUserRoutes.GET("/promotions/:title", server.getPromotionByTitle)
+	authUserRoutes.GET("/promotions/", server.listPromotion)
 
 	// -----------------------------------admin--------------------------------
 	authAdminRoutes := api.Group("/admin").Use(authAdminMiddleware(server.tokenMaker, server.store))
@@ -90,6 +103,29 @@ func (server *Server) setupRouter() {
 	// feedback
 	authAdminRoutes.GET("/products/:id/feedbacks", server.listFeedbackByID)
 	authAdminRoutes.DELETE("/users/:username/feedbacks/:product_commented/:id", server.adminDeleteFeedback)
+	// promotion
+	authAdminRoutes.POST("/promotions", server.createPromotion)
+	authAdminRoutes.GET("/promotions/:title", server.getPromotionByTitle)
+	authAdminRoutes.GET("/promotions/", server.listPromotion)
+	authAdminRoutes.PUT("/promotions/:title", server.updatePromotion)
+	authAdminRoutes.DELETE("/promotions/:id", server.deletePromotion)
+	// category
+	authAdminRoutes.POST("/categories", server.adminCreateCategory)
+	authAdminRoutes.PUT("/categories/:id", server.adminUpdateCategory)
+	authAdminRoutes.DELETE("/categories/:id", server.adminDeleteCategory)
+	// Products
+	authAdminRoutes.POST("/products", server.adminCreateProduct)
+	authAdminRoutes.PUT("/products/:id", server.adminUpdateProduct)
+	// Images of Product
+	authAdminRoutes.POST("/products/:id", server.adminAddImageProduct)
+
+	// Products In Category
+	authAdminRoutes.POST("/categories/:id/products", server.adminCreateProductInCategory)
+	authAdminRoutes.DELETE("/categories/:id/products/:product_id", server.adminDeleteProductInCategory)
+
+	// Add Product to Store
+	authAdminRoutes.POST("/products/:id/store", server.adminAddProductToStore)
+	authAdminRoutes.PUT("/products/:id/store", server.adminUpdateProductToStore)
 
 	server.router = router
 }

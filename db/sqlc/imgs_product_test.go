@@ -61,13 +61,7 @@ func TestListImgProductsByProductID(t *testing.T) {
 	}
 
 
-	arg := ListImgProductsParams {
-		ProductID: product.ID,
-		Limit: 5,
-		Offset: 0,
-	}
-
-	imgsproducts, err := testQueries.ListImgProducts(context.Background(), arg)
+	imgsproducts, err := testQueries.ListImgProducts(context.Background(), product.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, imgsproducts)
 	require.Len(t, imgsproducts, 5)
