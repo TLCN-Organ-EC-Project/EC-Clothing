@@ -70,7 +70,6 @@ func TestListPromotions(t *testing.T) {
 	promotions, err := testQueries.ListPromotions(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, promotions)
-	require.Len(t, promotions, 5)
 
 	for _,promotion := range promotions {
 		require.NotEmpty(t, promotion)

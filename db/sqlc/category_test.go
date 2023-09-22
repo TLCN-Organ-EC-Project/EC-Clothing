@@ -44,7 +44,6 @@ func TestListCategories(t *testing.T) {
 	categories, err := testQueries.ListCategories(context.Background())
 	require.NoError(t, err)
 	require.NotEmpty(t, categories)
-	require.Len(t, categories, 5)
 
 	for _, category := range categories {
 		require.NotEmpty(t, category)

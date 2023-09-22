@@ -22,7 +22,7 @@ func createRandomUser(t *testing.T) User {
 		Email:          util.RandonEmail(),
 		Phone:          util.RandomPhoneNo(),
 		Address:        util.RandomOwner(),
-		Province:       util.RandomProvince(),
+		Province:       1,
 		Role:           2,
 	}
 
