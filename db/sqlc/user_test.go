@@ -14,6 +14,7 @@ func createRandomUser(t *testing.T) User {
 	password := util.RandomOwner()
 	hashedPassword, err := util.HashPassword(password)
 	require.NoError(t, err)
+	province := createRandomProvince(t)
 
 	arg := CreateUserParams{
 		Username:       util.RandomOwner(),
@@ -22,7 +23,7 @@ func createRandomUser(t *testing.T) User {
 		Email:          util.RandonEmail(),
 		Phone:          util.RandomPhoneNo(),
 		Address:        util.RandomOwner(),
-		Province:       1,
+		Province:       province.ID,
 		Role:           2,
 	}
 
@@ -117,13 +118,15 @@ func TestListUsers(t *testing.T) {
 
 func TestUpdateUser(t *testing.T) {
 	user1 := createRandomUser(t)
+	province := createRandomProvince(t)
 	arg := UpdateUserParams {
 		Username: user1.Username,
 		FullName: util.RandomOwner(),
 		Email: util.RandonEmail(),
 		Phone: util.RandomPhoneNo(),
 		Address: util.RandomOwner(),
-		Province: util.RandomProvince(),
+		Province: province.ID,
+		
 	}
 	
 	user2, err := testQueries.UpdateUser(context.Background(), arg)

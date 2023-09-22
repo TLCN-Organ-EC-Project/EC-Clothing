@@ -1,3 +1,10 @@
+-- name: CreateProvince :one
+INSERT INTO provinces (
+  name
+) VALUES (
+  $1
+) RETURNING *;
+
 -- name: GetProvince :one
 SELECT * FROM provinces
 WHERE name = $1 LIMIT 1;

@@ -9,6 +9,21 @@ import (
 	"context"
 )
 
+const createProvince = `-- name: CreateProvince :one
+INSERT INTO provinces (
+  name
+) VALUES (
+  $1
+) RETURNING id, name
+`
+
+func (q *Queries) CreateProvince(ctx context.Context, name string) (Province, error) {
+	row := q.db.QueryRowContext(ctx, createProvince, name)
+	var i Province
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const getProvince = `-- name: GetProvince :one
 SELECT id, name FROM provinces
 WHERE name = $1 LIMIT 1
