@@ -22,6 +22,7 @@ type Querier interface {
 	CreateProductsInCategory(ctx context.Context, arg CreateProductsInCategoryParams) (ProductsInCategory, error)
 	CreatePromotion(ctx context.Context, arg CreatePromotionParams) (Promotion, error)
 	CreateProvince(ctx context.Context, name string) (Province, error)
+	CreateRole(ctx context.Context, name string) (Role, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateStore(ctx context.Context, arg CreateStoreParams) (Store, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
