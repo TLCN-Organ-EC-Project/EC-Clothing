@@ -14,10 +14,11 @@ INSERT INTO items_order (
   booking_id,
   product_id,
   quantity,
-  price
+  price,
+  size
 ) VALUES (
-  $1, $2, $3, $4
-) RETURNING id, booking_id, product_id, quantity, price
+  $1, $2, $3, $4, $5
+) RETURNING id, booking_id, product_id, quantity, price, size
 `
 
 type CreateItemsOrderParams struct {
@@ -25,6 +26,7 @@ type CreateItemsOrderParams struct {
 	ProductID int64   `json:"product_id"`
 	Quantity  int32   `json:"quantity"`
 	Price     float64 `json:"price"`
+	Size      string  `json:"size"`
 }
 
 func (q *Queries) CreateItemsOrder(ctx context.Context, arg CreateItemsOrderParams) (ItemsOrder, error) {
@@ -33,6 +35,7 @@ func (q *Queries) CreateItemsOrder(ctx context.Context, arg CreateItemsOrderPara
 		arg.ProductID,
 		arg.Quantity,
 		arg.Price,
+		arg.Size,
 	)
 	var i ItemsOrder
 	err := row.Scan(
@@ -41,6 +44,7 @@ func (q *Queries) CreateItemsOrder(ctx context.Context, arg CreateItemsOrderPara
 		&i.ProductID,
 		&i.Quantity,
 		&i.Price,
+		&i.Size,
 	)
 	return i, err
 }
@@ -55,7 +59,7 @@ func (q *Queries) DeleteItemsOrder(ctx context.Context, id int64) error {
 }
 
 const getItemsOrder = `-- name: GetItemsOrder :one
-SELECT id, booking_id, product_id, quantity, price FROM items_order
+SELECT id, booking_id, product_id, quantity, price, size FROM items_order
 WHERE id = $1 LIMIT 1
 `
 
@@ -68,26 +72,19 @@ func (q *Queries) GetItemsOrder(ctx context.Context, id int64) (ItemsOrder, erro
 		&i.ProductID,
 		&i.Quantity,
 		&i.Price,
+		&i.Size,
 	)
 	return i, err
 }
 
 const listItemsOrderByBookingID = `-- name: ListItemsOrderByBookingID :many
-SELECT id, booking_id, product_id, quantity, price FROM items_order
+SELECT id, booking_id, product_id, quantity, price, size FROM items_order
 WHERE booking_id = $1
 ORDER BY id
-LIMIT $2
-OFFSET $3
 `
 
-type ListItemsOrderByBookingIDParams struct {
-	BookingID string `json:"booking_id"`
-	Limit     int32  `json:"limit"`
-	Offset    int32  `json:"offset"`
-}
-
-func (q *Queries) ListItemsOrderByBookingID(ctx context.Context, arg ListItemsOrderByBookingIDParams) ([]ItemsOrder, error) {
-	rows, err := q.db.QueryContext(ctx, listItemsOrderByBookingID, arg.BookingID, arg.Limit, arg.Offset)
+func (q *Queries) ListItemsOrderByBookingID(ctx context.Context, bookingID string) ([]ItemsOrder, error) {
+	rows, err := q.db.QueryContext(ctx, listItemsOrderByBookingID, bookingID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +98,7 @@ func (q *Queries) ListItemsOrderByBookingID(ctx context.Context, arg ListItemsOr
 			&i.ProductID,
 			&i.Quantity,
 			&i.Price,
+			&i.Size,
 		); err != nil {
 			return nil, err
 		}

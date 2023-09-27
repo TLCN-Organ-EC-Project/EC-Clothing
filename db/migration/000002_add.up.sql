@@ -1,0 +1,1 @@
+ALTER TABLE "items_order" ADD "size" varchar NOT NULL;

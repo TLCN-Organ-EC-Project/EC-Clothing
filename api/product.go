@@ -24,7 +24,7 @@ type createProductRequest struct {
 	Gender      string  `json:"gender" binding:"required"`
 	Material    string  `json:"material" binding:"required"`
 	Size        string  `json:"size" binding:"required"`
-	SizeOfModel string  `json:"size_of_model" binding:"required"`
+	SizeOfModel string  `json:"size_of_model"`
 }
 
 type createProductResponse struct {
@@ -56,7 +56,7 @@ func newProductResponse(product db.Product, descriptionsProduct db.DescriptionsP
 // @Param data body createProductRequest true "createProductRequest data"
 // @Tags Admin
 // @Security bearerAuth
-// @Success 200 {object} createProductResponse
+// @Success 200 {object} db.CreateProductTxResults
 // @Failure 400 {string} error
 // @Failure 403 {string} error
 // @Failure 500 {string} error
@@ -68,70 +68,21 @@ func (server *Server) adminCreateProduct(ctx *gin.Context) {
 		return
 	}
 
-	config, err := util.LoadConfig("..")
-	if err != nil {
-		log.Fatal("Cannot load config: ", err)
-	}
-
-	cld, err := cloudinary.NewFromParams(config.CloudName, config.APIKey, config.APISecret)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	params := uploader.UploadParams{
-		Folder:         "ec-clothing",
-		Format:         "jpg",
-		Transformation: "f_auto,fl_lossy,q_auto:eco,dpr_auto,w_auto",
-	}
-
-	thumb, err := cld.Upload.Upload(ctx, req.Thumb, params)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	argProduct := db.CreateProductParams{
+	arg := db.CreateProductTxParams{
 		ProductName: req.ProductName,
-		Thumb:       thumb.SecureURL,
+		Thumb:       req.Thumb,
 		Price:       req.Price,
-	}
-
-	product, err := server.store.CreateProduct(ctx, argProduct)
-	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
-			case "foreign_key_violation", "unique_violation":
-				ctx.JSON(http.StatusForbidden, errorResponse(err))
-				return
-			}
-		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	argDescriptionsProduct := db.CreateDescriptionProductParams{
-		ProductID:   product.ID,
 		Gender:      req.Gender,
 		Material:    req.Material,
 		Size:        req.Size,
 		SizeOfModel: req.SizeOfModel,
 	}
 
-	descriptionsProduct, err := server.store.CreateDescriptionProduct(ctx, argDescriptionsProduct)
+	rsp, err := server.store.CreateProductTx(ctx, arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
-			case "foreign_key_violation", "unique_violation":
-				ctx.JSON(http.StatusForbidden, errorResponse(err))
-				return
-			}
-		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	rsp := newProductResponse(product, descriptionsProduct)
 	ctx.JSON(http.StatusOK, rsp)
 }
 

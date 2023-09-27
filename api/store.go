@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	db "github.com/XuanHieuHo/EC_Clothing/db/sqlc"
@@ -9,7 +10,7 @@ import (
 )
 
 type addProductToStoreRequest struct {
-	Size    []string `json:"size" binding:"required"`
+	Size     []string `json:"size" binding:"required"`
 	Quantity []int32  `json:"quantity" binding:"required,min=1"`
 }
 
@@ -39,12 +40,18 @@ func (server *Server) adminAddProductToStore(ctx *gin.Context) {
 		return
 	}
 
+	if len(req.Quantity) != len(req.Size) {
+		err := fmt.Errorf("retype full 2 properties")
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
 	var storeProduct []db.Store
 	for i := range req.Size {
 		size := req.Size[i]
 		quantity := req.Quantity[i]
 
-		arg := db.CreateStoreParams {
+		arg := db.CreateStoreParams{
 			ProductID: reqGet.ID,
 			Size:      size,
 			Quantity:  quantity,
@@ -100,7 +107,7 @@ func (server *Server) adminUpdateProductToStore(ctx *gin.Context) {
 		size := req.Size[i]
 		quantity := req.Quantity[i]
 
-		arg := db.UpdateStoreParams {
+		arg := db.UpdateStoreParams{
 			ProductID: reqGet.ID,
 			Size:      size,
 			Quantity:  quantity,

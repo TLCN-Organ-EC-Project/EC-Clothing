@@ -13,7 +13,6 @@ import (
 	"github.com/XuanHieuHo/EC_Clothing/token"
 	"github.com/XuanHieuHo/EC_Clothing/util"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
@@ -123,22 +122,13 @@ type loginUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-type loginUserResponse struct {
-	SessionID             uuid.UUID    `json:"session_id"`
-	AccessToken           string       `json:"access_token"`
-	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
-	RefreshToken          string       `json:"refresh_token"`
-	RefreshTokenExpiresAt time.Time    `json:"refresh_token_expires_at"`
-	User                  userResponse `json:"user"`
-}
-
 // @Summary Login user
 // @ID loginUser
 // @Produce json
 // @Accept json
 // @Param data body loginUserRequest true "loginUserRequest data"
 // @Tags Started
-// @Success 200 {object} loginUserResponse
+// @Success 200 {object} userResponse
 // @Failure 400 {string} error
 // @Failure 401 {string} error
 // @Failure 403 {string} error
@@ -200,15 +190,13 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := loginUserResponse{
-		SessionID:             session.ID,
-		AccessToken:           accessToken,
-		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
-		RefreshToken:          refreshToken,
-		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-		User:                  newUserResponse(user),
-	}
-	ctx.JSON(http.StatusOK, rsp)
+	ctx.Header("X-Session-ID", session.ID.String())
+	ctx.Header("X-Access-Token", accessToken)
+	ctx.Header("X-Access-Token-Expired-At", accessPayload.ExpiredAt.String())
+	ctx.Header("X-Refresh-Token", refreshToken)
+	ctx.Header("X-Refresh-Token-Expired-At", refreshPayload.ExpiredAt.String())
+
+	ctx.JSON(http.StatusOK, newUserResponse(user))
 }
 
 type getUserRequest struct {
@@ -515,6 +503,7 @@ type forgotPasswordRequest struct {
 	Username string `json:"username" binding:"required,alphanum"`
 	Email    string `json:"email" binding:"required,email"`
 }
+
 // @Summary Send Reset Password Token
 // @ID sendResetPasswordToken
 // @Produce json
@@ -649,6 +638,7 @@ type resetPasswordRequest struct {
 	FirstPassword  string `json:"first_password" binding:"required,min=6"`
 	SecondPassword string `json:"second_password" binding:"required,min=6"`
 }
+
 // @Summary Reset Password
 // @ID resetPassword
 // @Produce json
@@ -718,6 +708,7 @@ func (server *Server) resetPassword(ctx *gin.Context) {
 type checkPasswordRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
+
 // @Summary User Check Password
 // @ID checkPassword
 // @Produce json
@@ -777,6 +768,7 @@ type newPasswordRequest struct {
 	FirstPassword    string `json:"first_password" binding:"required,min=6"`
 	SecondPassword   string `json:"second_password" binding:"required,min=6"`
 }
+
 // @Summary User Change Password
 // @ID changePassword
 // @Produce json

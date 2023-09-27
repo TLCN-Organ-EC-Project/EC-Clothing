@@ -91,6 +91,12 @@ func (server *Server) setupRouter() {
 	//promotion
 	authUserRoutes.GET("/promotions/:title", server.getPromotionByTitle)
 	authUserRoutes.GET("/promotions/", server.listPromotion)
+	// order
+	authUserRoutes.POST("/users/:username/orders", server.createOrder)
+	authUserRoutes.GET("/users/:username/orders", server.listOrderByUser)
+	authUserRoutes.GET("/users/:username/orders/:booking_id", server.getOrder)
+	// order details
+	authUserRoutes.GET("/users/:username/orders/:booking_id/detail", server.getDetailOrderByBookingID)
 
 	// -----------------------------------admin--------------------------------
 	authAdminRoutes := api.Group("/admin").Use(authAdminMiddleware(server.tokenMaker, server.store))
@@ -127,6 +133,12 @@ func (server *Server) setupRouter() {
 	authAdminRoutes.POST("/products/:id/store", server.adminAddProductToStore)
 	authAdminRoutes.PUT("/products/:id/store", server.adminUpdateProductToStore)
 
+	// Order
+	authAdminRoutes.GET("/orders", server.adminListOrder)
+	authAdminRoutes.GET("/orders/:booking_id", server.adminGetOrderByBookingID)
+	authAdminRoutes.GET("/orders/users/:username", server.adminListOrderByUser)
+	// Order Detail
+	authAdminRoutes.GET("/orders/:booking_id/detail", server.adminGetDetailOrderByBookingID)
 	server.router = router
 }
 

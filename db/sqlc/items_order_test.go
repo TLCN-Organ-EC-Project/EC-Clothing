@@ -66,13 +66,7 @@ func TestListItemsOrderByBookingID(t *testing.T) {
 		createRandomItemsOrder(t, order)
 	}
 
-	arg := ListItemsOrderByBookingIDParams{
-		BookingID: order.BookingID,
-		Limit:     5,
-		Offset:    0,
-	}
-
-	itemsorders, err := testQueries.ListItemsOrderByBookingID(context.Background(), arg)
+	itemsorders, err := testQueries.ListItemsOrderByBookingID(context.Background(), order.BookingID)
 	require.NoError(t, err)
 	require.NotEmpty(t, itemsorders)
 	require.Len(t, itemsorders, 5)

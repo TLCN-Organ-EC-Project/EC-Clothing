@@ -28,5 +28,11 @@ ORDER BY booking_date
 LIMIT $1
 OFFSET $2;
 
+-- name: UpdateAmountOfOrder :one
+UPDATE orders
+SET amount = $2
+WHERE booking_id = $1
+RETURNING *;
+
 -- name: DeleteOrder :exec
 DELETE FROM orders WHERE booking_id = $1;
