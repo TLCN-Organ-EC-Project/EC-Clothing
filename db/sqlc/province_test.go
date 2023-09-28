@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomProvince(t *testing.T) Province {
-	name := util.RandomOwner()
+func createRandomProvince(t *testing.T, name string) Province {
+
 	province, err := testQueries.CreateProvince(context.Background(), name)
 
 	require.NoError(t, err)
@@ -21,5 +21,6 @@ func createRandomProvince(t *testing.T) Province {
 }
 
 func TestCreateProvince(t *testing.T) {
-	createRandomProvince(t)
+	name := util.RandomProvince()
+	createRandomProvince(t, name)
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func createRandomRole(t *testing.T) Role {
-	name := util.RandomOwner()
+	name := util.RandomPhoneNo()
 	role, err := testQueries.CreateRole(context.Background(), name)
 
 	require.NoError(t, err)

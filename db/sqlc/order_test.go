@@ -10,7 +10,8 @@ import (
 )
 
 func createRandomOrder(t *testing.T, user User, promotion Promotion) Order {
-	province := createRandomProvince(t)
+	name := util.RandomProvince()
+	province := createRandomProvince(t, name)
 	arg := CreateOrderParams{
 		BookingID:   util.RandomOrderCode(),
 		UserBooking: user.Username,

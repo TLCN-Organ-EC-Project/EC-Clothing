@@ -139,6 +139,8 @@ func (server *Server) setupRouter() {
 	authAdminRoutes.GET("/orders/users/:username", server.adminListOrderByUser)
 	// Order Detail
 	authAdminRoutes.GET("/orders/:booking_id/detail", server.adminGetDetailOrderByBookingID)
+	// Province
+	authAdminRoutes.POST("/provinces", server.createProvinces)
 	server.router = router
 }
 

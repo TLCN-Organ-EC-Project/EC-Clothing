@@ -98,6 +98,58 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const createUserNoProvince = `-- name: CreateUserNoProvince :one
+INSERT INTO users (
+  username,
+  hashed_password,
+  full_name,
+  email,
+  phone,
+  address,
+  role
+) VALUES (
+  $1, $2, $3, $4, $5, $6, $7
+) RETURNING username, hashed_password, full_name, email, phone, address, province, role, password_changed_at, created_at, reset_password_token, rspassword_token_expired_at
+`
+
+type CreateUserNoProvinceParams struct {
+	Username       string `json:"username"`
+	HashedPassword string `json:"hashed_password"`
+	FullName       string `json:"full_name"`
+	Email          string `json:"email"`
+	Phone          string `json:"phone"`
+	Address        string `json:"address"`
+	Role           int64  `json:"role"`
+}
+
+func (q *Queries) CreateUserNoProvince(ctx context.Context, arg CreateUserNoProvinceParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, createUserNoProvince,
+		arg.Username,
+		arg.HashedPassword,
+		arg.FullName,
+		arg.Email,
+		arg.Phone,
+		arg.Address,
+		arg.Role,
+	)
+	var i User
+	err := row.Scan(
+		&i.Username,
+		&i.HashedPassword,
+		&i.FullName,
+		&i.Email,
+		&i.Phone,
+		&i.Address,
+		&i.Province,
+		&i.Role,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
+		&i.ResetPasswordToken,
+		&i.RspasswordTokenExpiredAt,
+	)
+	return i, err
+}
+
 const deleteUser = `-- name: DeleteUser :exec
 DELETE FROM users WHERE username = $1
 `

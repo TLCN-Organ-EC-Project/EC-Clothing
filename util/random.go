@@ -54,8 +54,8 @@ func RandonEmail() string {
 	return fmt.Sprintf("%s@email.com", RandomString(6, alphabet))
 }
 
-func RandomProvince() int64 {
-	return RandomInt(1, 63)
+func RandomProvince() string {
+	return RandomString(3, alphabet)
 }
 
 func RandomResetPasswordToken() string {
