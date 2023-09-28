@@ -1,5 +1,6 @@
-DB_URL=postgresql://root:secret@localhost:5432/clothing?sslmode=disable
+DB_URL1=postgresql://root:secret@localhost:5432/clothing?sslmode=disable
 SQLC_URL=D:\Study\EC_Clothing:/src
+DB_URL=postgres://root:9OKjOaDKdKByUn8EzpAyjtzr4FPqH2hQ@dpg-ckafm3kg66mc73d3ul70-a.oregon-postgres.render.com/clothing_y3kn
 postgres:
 	docker run --name postgres12 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:15-alpine
 
