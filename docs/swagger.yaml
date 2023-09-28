@@ -1426,18 +1426,6 @@ paths:
       consumes:
       - application/json
       operationId: listCategory
-      parameters:
-      - in: query
-        minimum: 1
-        name: page_id
-        required: true
-        type: integer
-      - in: query
-        maximum: 10
-        minimum: 5
-        name: page_size
-        required: true
-        type: integer
       produces:
       - application/json
       responses:

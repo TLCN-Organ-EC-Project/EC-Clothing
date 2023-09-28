@@ -85,28 +85,16 @@ func (server *Server) getCategory(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, category)
 }
 
-type listCategoryRequest struct {
-	PageID   int32 `form:"page_id" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
-}
-
 // @Summary Get List Category
 // @ID listCategory
 // @Produce json
 // @Accept json
-// @Param data query listCategoryRequest true "listCategoryRequest data"
 // @Tags Started
 // @Success 200 {array} []db.Category
 // @Failure 400 {string} error
 // @Failure 500 {string} error
 // @Router /api/categories [get]
 func (server *Server) listCategory(ctx *gin.Context) {
-	var req listCategoryRequest
-	if err := ctx.ShouldBindQuery(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
 	categories, err := server.store.ListCategories(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))

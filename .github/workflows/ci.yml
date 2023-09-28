@@ -17,8 +17,8 @@ jobs:
         image: postgres:15-alpine
         env:
           POSTGRES_USER: root
-          POSTGRES_PASSWORD: secret
-          POSTGRES_DB: clothing
+          POSTGRES_PASSWORD: 9OKjOaDKdKByUn8EzpAyjtzr4FPqH2hQ
+          POSTGRES_DB: clothing_y3kn
         ports:
           - 5432:5432
         options: >-

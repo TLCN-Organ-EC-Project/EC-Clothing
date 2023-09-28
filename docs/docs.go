@@ -1443,23 +1443,6 @@ const docTemplate = `{
                 ],
                 "summary": "Get List Category",
                 "operationId": "listCategory",
-                "parameters": [
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "page_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "maximum": 10,
-                        "minimum": 5,
-                        "type": "integer",
-                        "name": "page_size",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
