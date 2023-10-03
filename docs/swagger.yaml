@@ -481,6 +481,13 @@ definitions:
       title:
         type: string
     type: object
+  db.Province:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   db.Store:
     properties:
       id:
@@ -1823,6 +1830,35 @@ paths:
           schema:
             type: string
       summary: Get List Provinces
+      tags:
+      - Started
+  /api/provinces/{id}:
+    get:
+      consumes:
+      - application/json
+      operationId: getProvinceByID
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Province'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get Provinces By ID
       tags:
       - Started
   /api/register:

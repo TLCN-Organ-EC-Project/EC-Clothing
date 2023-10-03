@@ -47,6 +47,7 @@ type Querier interface {
 	GetProductsInCategoryByID(ctx context.Context, arg GetProductsInCategoryByIDParams) (ProductsInCategory, error)
 	GetPromotion(ctx context.Context, title string) (Promotion, error)
 	GetProvince(ctx context.Context, name string) (Province, error)
+	GetProvinceByID(ctx context.Context, id int64) (Province, error)
 	GetRole(ctx context.Context, name string) (Role, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetStore(ctx context.Context, arg GetStoreParams) (Store, error)

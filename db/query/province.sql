@@ -9,6 +9,10 @@ INSERT INTO provinces (
 SELECT * FROM provinces
 WHERE name = $1 LIMIT 1;
 
+-- name: GetProvinceByID :one
+SELECT * FROM provinces
+WHERE id = $1 LIMIT 1;
+
 -- name: ListProvinces :many
 SELECT name FROM provinces
 ORDER BY name;

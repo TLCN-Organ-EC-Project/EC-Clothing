@@ -69,6 +69,7 @@ func (server *Server) setupRouter() {
 	api.GET("/categories/:id", server.getCategory)
 	// province
 	api.GET("/provinces", server.listProvinces)
+	api.GET("/provinces/:id", server.getProvinceByID)
 	//product
 	api.GET("/products/:id", server.getProductByID)
 	api.GET("/products", server.listProduct)

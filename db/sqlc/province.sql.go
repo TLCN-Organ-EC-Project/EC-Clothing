@@ -36,6 +36,18 @@ func (q *Queries) GetProvince(ctx context.Context, name string) (Province, error
 	return i, err
 }
 
+const getProvinceByID = `-- name: GetProvinceByID :one
+SELECT id, name FROM provinces
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetProvinceByID(ctx context.Context, id int64) (Province, error) {
+	row := q.db.QueryRowContext(ctx, getProvinceByID, id)
+	var i Province
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const listProvinces = `-- name: ListProvinces :many
 SELECT name FROM provinces
 ORDER BY name

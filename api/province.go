@@ -7,6 +7,35 @@ import (
 	"github.com/lib/pq"
 )
 
+type getProvinceRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1,max=63"`
+}
+
+// @Summary Get Provinces By ID
+// @ID getProvinceByID
+// @Produce json
+// @Accept json
+// @Tags Started
+// @Param id path string true "ID"
+// @Success 200 {object} db.Province
+// @Failure 400 {string} error
+// @Failure 500 {string} error
+// @Router /api/provinces/{id} [get]
+func (server *Server) getProvinceByID(ctx *gin.Context) {
+	var req getProvinceRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	province, err := server.store.GetProvinceByID(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, province)
+}
+
 // @Summary Get List Provinces
 // @ID listProvinces
 // @Produce json
