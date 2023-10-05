@@ -11,6 +11,19 @@ INSERT INTO products (
 SELECT * FROM products
 WHERE id = $1 LIMIT 1;
 
+-- name: FindProduct :many
+SELECT products.*
+FROM products
+INNER JOIN descriptions_product
+ON products.id = descriptions_product.product_id
+WHERE (
+  product_name ILIKE '%' || $1 || '%'
+  OR descriptions_product.gender ILIKE '%' || $1 || '%'
+  OR descriptions_product.material ILIKE '%' || $1 || '%'
+)
+LIMIT $2
+OFFSET $3;
+
 -- name: ListProducts :many
 SELECT * FROM products
 ORDER BY product_name

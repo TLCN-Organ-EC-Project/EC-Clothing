@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createProduct = `-- name: CreateProduct :one
@@ -44,6 +45,54 @@ DELETE FROM products WHERE id = $1
 func (q *Queries) DeleteProduct(ctx context.Context, id int64) error {
 	_, err := q.db.ExecContext(ctx, deleteProduct, id)
 	return err
+}
+
+const findProduct = `-- name: FindProduct :many
+SELECT products.id, products.product_name, products.thumb, products.price
+FROM products
+INNER JOIN descriptions_product
+ON products.id = descriptions_product.product_id
+WHERE (
+  product_name ILIKE '%' || $1 || '%'
+  OR descriptions_product.gender ILIKE '%' || $1 || '%'
+  OR descriptions_product.material ILIKE '%' || $1 || '%'
+)
+LIMIT $2
+OFFSET $3
+`
+
+type FindProductParams struct {
+	Column1 sql.NullString `json:"column_1"`
+	Limit   int32          `json:"limit"`
+	Offset  int32          `json:"offset"`
+}
+
+func (q *Queries) FindProduct(ctx context.Context, arg FindProductParams) ([]Product, error) {
+	rows, err := q.db.QueryContext(ctx, findProduct, arg.Column1, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Product{}
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductName,
+			&i.Thumb,
+			&i.Price,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getProduct = `-- name: GetProduct :one

@@ -315,3 +315,46 @@ func (server *Server) adminUpdateProduct(ctx *gin.Context) {
 	rsp := newProductResponse(updateProduct, updateDescriptionsProduct)
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+type findProductRequest struct {
+	Keyword  string `form:"keyword" binding:"required"`
+	PageID   int32  `form:"page_id" binding:"required,min=1"`
+	PageSize int32  `form:"page_size" binding:"required,min=10,max=20"`
+}
+
+// @Summary Find Product
+// @ID findProduct
+// @Produce json
+// @Accept json
+// @Param data query findProductRequest true "findProductRequest data"
+// @Tags Started
+// @Success 200 {object} []db.Product
+// @Failure 400 {string} error
+// @Failure 403 {string} error
+// @Failure 500 {string} error
+// @Router /api/products/find [get]
+func (server *Server) findProduct(ctx *gin.Context) {
+	var req findProductRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// Chuyển đổi chuỗi thành sql.NullString
+	keywordNullString := sql.NullString{
+		String: req.Keyword,
+		Valid:  true,
+	}
+
+	products, err := server.store.FindProduct(ctx, db.FindProductParams{
+		Column1: keywordNullString,
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, products)
+}

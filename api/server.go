@@ -74,6 +74,7 @@ func (server *Server) setupRouter() {
 	//product
 	api.GET("/products/:id", server.getProductByID)
 	api.GET("/products", server.listProduct)
+	api.GET("/products/find", server.findProduct)
 	// product in category
 	api.GET("/categories/:id/products", server.getProductsInCategory)
 

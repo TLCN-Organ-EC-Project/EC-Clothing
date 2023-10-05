@@ -38,6 +38,7 @@ type Querier interface {
 	DeletePromotion(ctx context.Context, id int64) error
 	DeleteStore(ctx context.Context, arg DeleteStoreParams) error
 	DeleteUser(ctx context.Context, username string) error
+	FindProduct(ctx context.Context, arg FindProductParams) ([]Product, error)
 	GetCategory(ctx context.Context, id int64) (Category, error)
 	GetDescriptionProductByID(ctx context.Context, productID int64) (DescriptionsProduct, error)
 	GetFeedback(ctx context.Context, id int64) (Feedback, error)
