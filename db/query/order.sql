@@ -28,6 +28,12 @@ ORDER BY booking_date
 LIMIT $1
 OFFSET $2;
 
+-- name: UpdateOrder :one
+UPDATE orders
+SET address = $2, province = $3
+WHERE booking_id = $1
+RETURNING *;
+
 -- name: UpdateAmountOfOrder :one
 UPDATE orders
 SET amount = $2

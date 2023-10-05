@@ -214,3 +214,34 @@ func (q *Queries) UpdateAmountOfOrder(ctx context.Context, arg UpdateAmountOfOrd
 	)
 	return i, err
 }
+
+const updateOrder = `-- name: UpdateOrder :one
+UPDATE orders
+SET address = $2, province = $3
+WHERE booking_id = $1
+RETURNING booking_id, user_booking, promotion_id, status, booking_date, address, province, tax, amount, payment_method
+`
+
+type UpdateOrderParams struct {
+	BookingID string `json:"booking_id"`
+	Address   string `json:"address"`
+	Province  int64  `json:"province"`
+}
+
+func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
+	row := q.db.QueryRowContext(ctx, updateOrder, arg.BookingID, arg.Address, arg.Province)
+	var i Order
+	err := row.Scan(
+		&i.BookingID,
+		&i.UserBooking,
+		&i.PromotionID,
+		&i.Status,
+		&i.BookingDate,
+		&i.Address,
+		&i.Province,
+		&i.Tax,
+		&i.Amount,
+		&i.PaymentMethod,
+	)
+	return i, err
+}

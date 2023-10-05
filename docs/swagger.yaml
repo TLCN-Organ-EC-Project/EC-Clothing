@@ -286,6 +286,33 @@ definitions:
     required:
     - name
     type: object
+  api.updateOrderRequest:
+    properties:
+      address:
+        type: string
+      product_id:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      province:
+        type: string
+      quantity:
+        items:
+          type: integer
+        minItems: 1
+        type: array
+      size:
+        items:
+          type: string
+        type: array
+    required:
+    - address
+    - product_id
+    - province
+    - quantity
+    - size
+    type: object
   api.updatePromotionRequest:
     properties:
       description:
@@ -327,8 +354,6 @@ definitions:
       phone:
         type: string
       province:
-        type: integer
-      role:
         type: integer
       username:
         type: string
@@ -498,6 +523,17 @@ definitions:
         type: integer
       size:
         type: string
+    type: object
+  db.UpdateOrderTxResult:
+    properties:
+      order:
+        $ref: '#/definitions/db.Order'
+      product_ordered:
+        items:
+          $ref: '#/definitions/db.ItemsOrder'
+        type: array
+      user_order:
+        $ref: '#/definitions/db.userResponse'
     type: object
   db.userResponse:
     properties:
@@ -2430,6 +2466,99 @@ paths:
       security:
       - bearerAuth: []
       summary: User Get Order
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      operationId: updateOrder
+      parameters:
+      - description: updateOrderRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateOrderRequest'
+      - description: UserOrder
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: BookingID
+        in: path
+        name: booking_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.UpdateOrderTxResult'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Update Order
+      tags:
+      - User
+  /api/users/{username}/orders/{booking_id}/cancel:
+    put:
+      consumes:
+      - application/json
+      operationId: cancelOrder
+      parameters:
+      - description: UserBooking
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: BookingID
+        in: path
+        name: booking_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Cancel Order
       tags:
       - User
   /api/users/{username}/orders/{booking_id}/detail:

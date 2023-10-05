@@ -31,6 +31,7 @@ type Querier interface {
 	DeleteFeedback(ctx context.Context, id int64) error
 	DeleteImgProduct(ctx context.Context, id int64) error
 	DeleteItemsOrder(ctx context.Context, id int64) error
+	DeleteItemsOrderByBookingID(ctx context.Context, bookingID string) error
 	DeleteOrder(ctx context.Context, bookingID string) error
 	DeleteProduct(ctx context.Context, id int64) error
 	DeleteProductsInCategory(ctx context.Context, id int64) error
@@ -72,6 +73,7 @@ type Querier interface {
 	UpdateDescriptionProduct(ctx context.Context, arg UpdateDescriptionProductParams) (DescriptionsProduct, error)
 	UpdateFeedback(ctx context.Context, arg UpdateFeedbackParams) (Feedback, error)
 	UpdateImgProduct(ctx context.Context, arg UpdateImgProductParams) (ImgsProduct, error)
+	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 	UpdateProductsInCategory(ctx context.Context, arg UpdateProductsInCategoryParams) (ProductsInCategory, error)
 	UpdatePromotion(ctx context.Context, arg UpdatePromotionParams) (Promotion, error)

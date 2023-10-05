@@ -184,8 +184,8 @@ func (server *Server) listOrderByUser(ctx *gin.Context) {
 
 	listOrders, err := server.store.ListOrderByUser(ctx, db.ListOrderByUserParams{
 		UserBooking: user.Username,
-		Limit:  reqList.PageSize,
-		Offset: (reqList.PageID - 1) * reqList.PageSize,
+		Limit:       reqList.PageSize,
+		Offset:      (reqList.PageID - 1) * reqList.PageSize,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -216,7 +216,7 @@ func (server *Server) adminListOrder(ctx *gin.Context) {
 		return
 	}
 
-	listOrders, err := server.store.ListOrder(ctx, db.ListOrderParams {
+	listOrders, err := server.store.ListOrder(ctx, db.ListOrderParams{
 		Limit:  reqList.PageSize,
 		Offset: (reqList.PageID - 1) * reqList.PageSize,
 	})
@@ -298,8 +298,8 @@ func (server *Server) adminListOrderByUser(ctx *gin.Context) {
 
 	listOrders, err := server.store.ListOrderByUser(ctx, db.ListOrderByUserParams{
 		UserBooking: user.Username,
-		Limit:  reqList.PageSize,
-		Offset: (reqList.PageID - 1) * reqList.PageSize,
+		Limit:       reqList.PageSize,
+		Offset:      (reqList.PageID - 1) * reqList.PageSize,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -307,4 +307,136 @@ func (server *Server) adminListOrderByUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, listOrders)
+}
+
+type updateOrderRequest struct {
+	Address   string   `json:"address" binding:"required"`
+	Province  string   `json:"province" binding:"required"`
+	ProductID []int64  `json:"product_id" binding:"required,min=1"`
+	Size      []string `json:"size" binding:"required"`
+	Quantity  []int64  `json:"quantity" binding:"required,min=1"`
+}
+
+// @Summary User Update Order
+// @ID updateOrder
+// @Produce json
+// @Accept json
+// @Param data body updateOrderRequest true "updateOrderRequest data"
+// @Param username path string true "UserOrder"
+// @Param booking_id path string true "BookingID"
+// @Security bearerAuth
+// @Tags User
+// @Success 200 {object} db.UpdateOrderTxResult
+// @Failure 400 {string} error
+// @Failure 401 {string} error
+// @Failure 404 {string} error
+// @Failure 500 {string} error
+// @Router /api/users/{username}/orders/{booking_id} [put]
+func (server *Server) updateOrder(ctx *gin.Context) {
+	var reqGet getOrderRequest
+	var req updateOrderRequest
+
+	if err := ctx.ShouldBindUri(&reqGet); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUser(ctx, reqGet.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.Username != authPayload.Username {
+		err := errors.New("user doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	order, err := server.store.GetOrder(ctx, reqGet.BookingID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateOrderTxParams{
+		Username:  user.Username,
+		Address:   req.Address,
+		Province:  req.Province,
+		ProductID: req.ProductID,
+		Size:      req.Size,
+		Quantity:  req.Quantity,
+		BookingID: order.BookingID,
+	}
+
+	result, err := server.store.UpdateOrderTx(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, result)
+}
+
+// @Summary User Cancel Order
+// @ID cancelOrder
+// @Produce json
+// @Accept json
+// @Param username path string true "UserBooking"
+// @Param booking_id path string true "BookingID"
+// @Security bearerAuth
+// @Tags User
+// @Success 200 {string} successfully
+// @Failure 400 {string} error
+// @Failure 401 {string} error
+// @Failure 404 {string} error
+// @Failure 500 {string} error
+// @Router /api/users/{username}/orders/{booking_id}/cancel [put]
+func (server *Server) cancelOrder(ctx *gin.Context) {
+	var req getOrderRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUser(ctx, req.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.Username != authPayload.Username {
+		err := errors.New("user doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	arg := db.CancelOrderParams {
+		BookingID:       req.BookingID,
+		UserBooking:     req.Username,
+	}
+
+	rsp, err := server.store.CancelOrderTx(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }

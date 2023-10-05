@@ -2962,6 +2962,149 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Update Order",
+                "operationId": "updateOrder",
+                "parameters": [
+                    {
+                        "description": "updateOrderRequest data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.updateOrderRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "UserOrder",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "BookingID",
+                        "name": "booking_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.UpdateOrderTxResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/{username}/orders/{booking_id}/cancel": {
+            "put": {
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User Cancel Order",
+                "operationId": "cancelOrder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UserBooking",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "BookingID",
+                        "name": "booking_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         },
         "/api/users/{username}/orders/{booking_id}/detail": {
@@ -3455,6 +3598,44 @@ const docTemplate = `{
                 }
             }
         },
+        "api.updateOrderRequest": {
+            "type": "object",
+            "required": [
+                "address",
+                "product_id",
+                "province",
+                "quantity",
+                "size"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "province": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "size": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "api.updatePromotionRequest": {
             "type": "object",
             "required": [
@@ -3516,9 +3697,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "province": {
-                    "type": "integer"
-                },
-                "role": {
                     "type": "integer"
                 },
                 "username": {
@@ -3778,6 +3956,23 @@ const docTemplate = `{
                 },
                 "size": {
                     "type": "string"
+                }
+            }
+        },
+        "db.UpdateOrderTxResult": {
+            "type": "object",
+            "properties": {
+                "order": {
+                    "$ref": "#/definitions/db.Order"
+                },
+                "product_ordered": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/db.ItemsOrder"
+                    }
+                },
+                "user_order": {
+                    "$ref": "#/definitions/db.userResponse"
                 }
             }
         },

@@ -97,6 +97,8 @@ func (server *Server) setupRouter() {
 	authUserRoutes.POST("/users/:username/orders", server.createOrder)
 	authUserRoutes.GET("/users/:username/orders", server.listOrderByUser)
 	authUserRoutes.GET("/users/:username/orders/:booking_id", server.getOrder)
+	authUserRoutes.PUT("/users/:username/orders/:booking_id", server.updateOrder)
+	authUserRoutes.PUT("/users/:username/orders/:booking_id/cancel", server.cancelOrder)
 	// order details
 	authUserRoutes.GET("/users/:username/orders/:booking_id/detail", server.getDetailOrderByBookingID)
 

@@ -20,3 +20,6 @@ ORDER BY id;
 
 -- name: DeleteItemsOrder :exec
 DELETE FROM items_order WHERE id = $1;
+
+-- name: DeleteItemsOrderByBookingID :exec
+DELETE FROM items_order WHERE booking_id = $1;

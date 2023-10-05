@@ -19,6 +19,8 @@ type Stores interface {
 	CreateProductTx(ctx context.Context, arg CreateProductTxParams) (CreateProductTxResults, error)
 	CreateImgProductTx(ctx context.Context, arg AddImageProductTxParams) ([]ImgsProduct, error)
 	OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxResult, error)
+	UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParams) (UpdateOrderTxResult, error)
+	CancelOrderTx(ctx context.Context, arg CancelOrderParams) (string, error)
 }
 
 type SQLStore struct {
@@ -256,7 +258,7 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 		if err != nil {
 			return err
 		}
-		
+
 		result.UserOrder = newUserResponse(user)
 
 		bookingID := util.RandomOrderCode()
@@ -264,6 +266,27 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 		province, err := q.GetProvince(ctx, arg.Province)
 		if err != nil {
 			return err
+		}
+
+		var discount float64
+		if arg.PromotionID != "none" {
+			promotion, err := q.GetPromotion(ctx, arg.PromotionID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					err = fmt.Errorf("promotion code doesn't exist")
+					return err
+				} else {
+					return err
+				}
+			}
+
+			if time.Now().After(promotion.EndDate) {
+				err = fmt.Errorf("promotion code has expired")
+				return err
+			}
+			discount = promotion.DiscountPercent / 100
+		} else {
+			discount = 0
 		}
 
 		argOrder := CreateOrderParams{
@@ -329,12 +352,8 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 			}
 
 		}
-		promotion, err := q.GetPromotion(ctx, argOrder.PromotionID)
-		if err != nil {
-			return err
-		}
 
-		amount = (amount + order.Tax*amount)*((100 - promotion.DiscountPercent)*0.01)
+		amount = (amount + order.Tax*amount) * (1 - discount)
 
 		result.Order, err = q.UpdateAmountOfOrder(ctx, UpdateAmountOfOrderParams{
 			BookingID: order.BookingID,
@@ -352,4 +371,224 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 		return nil
 	})
 	return result, err
+}
+
+type UpdateOrderTxParams struct {
+	Username  string   `json:"username"`
+	BookingID string   `json:"booking_id"`
+	Address   string   `json:"address"`
+	Province  string   `json:"province"`
+	ProductID []int64  `json:"product_id"`
+	Size      []string `json:"size"`
+	Quantity  []int64  `json:"quantity"`
+}
+
+type UpdateOrderTxResult struct {
+	Order          Order        `json:"order"`
+	UserOrder      userResponse `json:"user_order"`
+	ProductOrdered []ItemsOrder `json:"product_ordered"`
+}
+
+func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParams) (UpdateOrderTxResult, error) {
+	var result UpdateOrderTxResult
+
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		if (len(arg.ProductID) != len(arg.Size)) || (len(arg.ProductID) != len(arg.Quantity)) || (len(arg.Size) != len(arg.Quantity)) {
+			err := errors.New("the length of one or more of the properties is not equal")
+			return err
+		}
+
+		user, err := q.GetUser(ctx, arg.Username)
+		if err != nil {
+			return err
+		}
+
+		result.UserOrder = newUserResponse(user)
+
+		province, err := q.GetProvince(ctx, arg.Province)
+		if err != nil {
+			return err
+		}
+
+		argUpdateOrder := UpdateOrderParams{
+			BookingID: arg.BookingID,
+			Address:   arg.Address,
+			Province:  province.ID,
+		}
+		order, err := q.UpdateOrder(ctx, argUpdateOrder)
+		if err != nil {
+			return err
+		}
+
+		var discount float64
+		if order.PromotionID != "none" {
+			promotion, err := q.GetPromotion(ctx, order.PromotionID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					err = fmt.Errorf("promotion code doesn't exist")
+					return err
+				} else {
+					return err
+				}
+			}
+
+			if time.Now().After(promotion.EndDate) {
+				err = fmt.Errorf("promotion code has expired")
+				return err
+			}
+			discount = promotion.DiscountPercent / 100
+		} else {
+			discount = 0
+		}
+
+		items, err := q.ListItemsOrderByBookingID(ctx, arg.BookingID)
+		if err != nil {
+			return err
+		}
+		for _, item := range items {
+			store, err := q.GetStore(ctx, GetStoreParams{
+				ProductID: item.ProductID,
+				Size:      item.Size,
+			})
+			if err != nil {
+				return err
+			}
+
+			_, err = q.UpdateStore(ctx, UpdateStoreParams{
+				ProductID: item.ProductID,
+				Size:      item.Size,
+				Quantity:  item.Quantity + store.Quantity,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		err = q.DeleteItemsOrderByBookingID(ctx, arg.BookingID)
+		if err != nil {
+			return err
+		}
+
+		var amount float64
+		amount = 0
+		for i, productID := range arg.ProductID {
+			size := arg.Size[i]
+			quantity := arg.Quantity[i]
+
+			product, err := q.GetProduct(ctx, productID)
+			if err != nil {
+				return err
+			}
+
+			store, err := q.GetStore(ctx, GetStoreParams{
+				ProductID: product.ID,
+				Size:      size,
+			})
+			if err != nil {
+				return err
+			}
+
+			if quantity > int64(store.Quantity) {
+				err := errors.New("quantity is not enough")
+				return err
+			}
+
+			argItemOrder := CreateItemsOrderParams{
+				BookingID: arg.BookingID,
+				ProductID: productID,
+				Quantity:  int32(quantity),
+				Size:      size,
+				Price:     product.Price * float64(quantity),
+			}
+
+			amount = amount + argItemOrder.Price
+
+			_, err = q.CreateItemsOrder(ctx, argItemOrder)
+			if err != nil {
+				return err
+			}
+
+			_, err = q.UpdateStore(ctx, UpdateStoreParams{
+				ProductID: store.ProductID,
+				Size:      store.Size,
+				Quantity:  store.Quantity - argItemOrder.Quantity,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
+		amount = (amount + order.Tax*amount) * (1 - discount)
+
+		result.Order, err = q.UpdateAmountOfOrder(ctx, UpdateAmountOfOrderParams{
+			BookingID: order.BookingID,
+			Amount:    amount,
+		})
+		if err != nil {
+			return err
+		}
+
+		result.ProductOrdered, err = q.ListItemsOrderByBookingID(ctx, order.BookingID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	return result, err
+}
+
+type CancelOrderParams struct {
+	BookingID   string `json:"booking_id"`
+	UserBooking string `json:"user_booking"`
+}
+
+func (store *SQLStore) CancelOrderTx(ctx context.Context, arg CancelOrderParams) (string, error) {
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		order, err := q.GetOrder(ctx, arg.BookingID)
+		if err != nil {
+			return err
+		}
+
+		items, err := q.ListItemsOrderByBookingID(ctx, order.BookingID)
+		if err != nil {
+			return err
+		}
+		for _, item := range items {
+			store, err := q.GetStore(ctx, GetStoreParams{
+				ProductID: item.ProductID,
+				Size:      item.Size,
+			})
+			if err != nil {
+				return err
+			}
+
+			_, err = q.UpdateStore(ctx, UpdateStoreParams{
+				ProductID: item.ProductID,
+				Size:      item.Size,
+				Quantity:  item.Quantity + store.Quantity,
+			})
+			if err != nil {
+				return err
+			}
+		}
+		err = q.DeleteItemsOrderByBookingID(ctx, order.BookingID)
+		if err != nil {
+			return err
+		}
+
+		err = q.DeleteOrder(ctx, order.BookingID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+	return "Cancelling booking successfully", err
 }
