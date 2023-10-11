@@ -372,6 +372,11 @@ func (server *Server) updateOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	if order.UserBooking != authPayload.Username {
+		err := errors.New("order doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
 
 	arg := db.UpdateOrderTxParams{
 		Username:  user.Username,
@@ -424,6 +429,21 @@ func (server *Server) cancelOrder(ctx *gin.Context) {
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	if user.Username != authPayload.Username {
 		err := errors.New("user doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	order, err := server.store.GetOrder(ctx, req.BookingID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	if order.UserBooking != authPayload.Username {
+		err := errors.New("order doesn't belong to the authenticated user")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}

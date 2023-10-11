@@ -102,6 +102,11 @@ func (server *Server) setupRouter() {
 	authUserRoutes.PUT("/users/:username/orders/:booking_id/cancel", server.cancelOrder)
 	// order details
 	authUserRoutes.GET("/users/:username/orders/:booking_id/detail", server.getDetailOrderByBookingID)
+	// carts
+	authUserRoutes.POST("/users/:username/carts", server.createCart)
+	authUserRoutes.GET("/users/:username/carts", server.listCartOfUser)
+	authUserRoutes.PUT("/users/:username/carts/:cart_id", server.updateCart)
+	authUserRoutes.DELETE("/users/:username/carts/:cart_id", server.deleteCart)
 
 	// -----------------------------------admin--------------------------------
 	authAdminRoutes := api.Group("/admin").Use(authAdminMiddleware(server.tokenMaker, server.store))

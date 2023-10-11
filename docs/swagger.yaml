@@ -31,6 +31,21 @@ definitions:
     required:
     - password
     type: object
+  api.createCartRequest:
+    properties:
+      product_id:
+        minimum: 1
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+      size:
+        type: string
+    required:
+    - product_id
+    - quantity
+    - size
+    type: object
   api.createCategoryRequest:
     properties:
       name:
@@ -279,6 +294,17 @@ definitions:
     - second_password
     - username
     type: object
+  api.updateCartRequest:
+    properties:
+      quantity:
+        minimum: 1
+        type: integer
+      size:
+        type: string
+    required:
+    - quantity
+    - size
+    type: object
   api.updateCategoryRequest:
     properties:
       name:
@@ -355,6 +381,21 @@ definitions:
         type: string
       province:
         type: integer
+      username:
+        type: string
+    type: object
+  db.Cart:
+    properties:
+      id:
+        type: integer
+      price:
+        type: number
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+      size:
+        type: string
       username:
         type: string
     type: object
@@ -2124,6 +2165,195 @@ paths:
       security:
       - bearerAuth: []
       summary: Update User
+      tags:
+      - User
+  /api/users/{username}/carts:
+    get:
+      consumes:
+      - application/json
+      operationId: listCartOfUser
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 20
+        minimum: 10
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Cart'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Get List Cart
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      operationId: createCart
+      parameters:
+      - description: createCartRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.createCartRequest'
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Cart'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Add Cart
+      tags:
+      - User
+  /api/users/{username}/carts/{cart_id}:
+    delete:
+      consumes:
+      - application/json
+      operationId: deleteCart
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: CartID
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Delete Cart
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      operationId: updatCart
+      parameters:
+      - description: updateCartRequest data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateCartRequest'
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: CartID
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Cart'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Update Cart
       tags:
       - User
   /api/users/{username}/change:

@@ -124,7 +124,7 @@ func (store *SQLStore) CreateProductTx(ctx context.Context, arg CreateProductTxP
 			Price:       arg.Price,
 		}
 
-		product, err := store.CreateProduct(ctx, argProduct)
+		product, err := q.CreateProduct(ctx, argProduct)
 		if err != nil {
 			if pqErr, ok := err.(*pq.Error); ok {
 				switch pqErr.Code.Name() {
@@ -143,7 +143,7 @@ func (store *SQLStore) CreateProductTx(ctx context.Context, arg CreateProductTxP
 			SizeOfModel: arg.SizeOfModel,
 		}
 
-		descriptionsProduct, err := store.CreateDescriptionProduct(ctx, argDescriptionsProduct)
+		descriptionsProduct, err := q.CreateDescriptionProduct(ctx, argDescriptionsProduct)
 		if err != nil {
 			if pqErr, ok := err.(*pq.Error); ok {
 				switch pqErr.Code.Name() {
@@ -208,7 +208,7 @@ func (store *SQLStore) CreateImgProductTx(ctx context.Context, arg AddImageProdu
 				Image:     img.SecureURL,
 			}
 
-			imgProduct, err := store.CreateImgProduct(ctx, arg)
+			imgProduct, err := q.CreateImgProduct(ctx, arg)
 			if err != nil {
 				if pqErr, ok := err.(*pq.Error); ok {
 					switch pqErr.Code.Name() {
