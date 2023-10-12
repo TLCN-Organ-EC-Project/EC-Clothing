@@ -101,6 +101,13 @@ type listCartRequest struct {
 	PageSize int32 `form:"page_size" binding:"required,min=10,max=20"`
 }
 
+type listCartResponse struct {
+	Carts []struct {
+		Cart db.Cart `json:"cart"`
+		Product db.Product `json:"product"`
+	} `json:"carts"`
+}
+
 // @Summary User Get List Cart
 // @ID listCartOfUser
 // @Produce json
@@ -118,6 +125,7 @@ type listCartRequest struct {
 func (server *Server) listCartOfUser(ctx *gin.Context) {
 	var req getUserRequest
 	var reqList listCartRequest
+	var result listCartResponse
 
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -155,8 +163,20 @@ func (server *Server) listCartOfUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	for _, cart := range listCarts {
+		product, err := server.store.GetProduct(ctx, cart.ProductID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		
+		result.Carts = append(result.Carts, struct {
+			Cart db.Cart  `json:"cart"`
+			Product db.Product `json:"product"`
+		}{cart, product})
+	}
 
-	ctx.JSON(http.StatusOK, listCarts)
+	ctx.JSON(http.StatusOK, result)
 }
 
 type updateCartRequest struct {
@@ -237,11 +257,11 @@ func (server *Server) updateCart(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.UpdateCartParams {
-		ID: cart.ID,
+	arg := db.UpdateCartParams{
+		ID:       cart.ID,
 		Quantity: int32(req.Quantity),
-		Size: req.Size,
-		Price: product.Price * float64(req.Quantity),
+		Size:     req.Size,
+		Price:    product.Price * float64(req.Quantity),
 	}
 
 	updatedCart, err := server.store.UpdateCart(ctx, arg)
