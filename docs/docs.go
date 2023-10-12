@@ -2481,10 +2481,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.Cart"
-                            }
+                            "$ref": "#/definitions/api.listCartResponse"
                         }
                     },
                     "400": {
@@ -3853,6 +3850,25 @@ const docTemplate = `{
                                 "items": {
                                     "$ref": "#/definitions/db.Store"
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "api.listCartResponse": {
+            "type": "object",
+            "properties": {
+                "carts": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "cart": {
+                                "$ref": "#/definitions/db.Cart"
+                            },
+                            "product": {
+                                "$ref": "#/definitions/db.Product"
                             }
                         }
                     }

@@ -116,7 +116,7 @@ type listCartResponse struct {
 // @Param data query listCartRequest true "listCartRequest data"
 // @Security bearerAuth
 // @Tags User
-// @Success 200 {object} []db.Cart
+// @Success 200 {object} listCartResponse
 // @Failure 400 {string} error
 // @Failure 401 {string} error
 // @Failure 404 {string} error
