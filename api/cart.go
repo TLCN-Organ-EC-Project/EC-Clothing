@@ -72,28 +72,73 @@ func (server *Server) createCart(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.CreateCartParams{
-		Username:  reqUser.Username,
-		ProductID: req.ProductID,
-		Quantity:  int32(req.Quantity),
-		Size:      req.Size,
-		Price:     product.Price * float64(req.Quantity),
+	store, err := server.store.GetStore(ctx, db.GetStoreParams{
+		ProductID: product.ID,
+		Size: req.Size,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
-	cart, err := server.store.CreateCart(ctx, arg)
+	if req.Quantity > int64(store.Quantity) {
+		err := errors.New("quantity is not enough")
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	existCart, err := server.store.GetCartDetails(ctx, db.GetCartDetailsParams{
+		Username: reqUser.Username,
+		ProductID: req.ProductID,
+		Size: req.Size,
+	})
+	// nếu lỗi không có hàng nào thì tạo mới, nếu đã tổn tại thì update lại số lượng và tiền
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
-			case "foreign_key_violation", "unique_violation":
-				ctx.JSON(http.StatusForbidden, errorResponse(err))
+		if err == sql.ErrNoRows {
+			arg := db.CreateCartParams{
+				Username:  reqUser.Username,
+				ProductID: req.ProductID,
+				Quantity:  int32(req.Quantity),
+				Size:      req.Size,
+				Price:     product.Price * float64(req.Quantity),
+			}
+		
+			cart, err := server.store.CreateCart(ctx, arg)
+			if err != nil {
+				if pqErr, ok := err.(*pq.Error); ok {
+					switch pqErr.Code.Name() {
+					case "foreign_key_violation", "unique_violation":
+						ctx.JSON(http.StatusForbidden, errorResponse(err))
+						return
+					}
+				}
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 				return
 			}
+			ctx.JSON(http.StatusOK, cart)
+			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, cart)
+	quantity := existCart.Quantity + int32(req.Quantity)
+	if quantity > store.Quantity {
+		err := errors.New("quantity is not enough")
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	updateCart, err := server.store.UpdateCart(ctx, db.UpdateCartParams{
+		ID: existCart.ID,
+		Quantity: quantity,
+		Size: req.Size,
+		Price: existCart.Price + product.Price * float64(req.Quantity),
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, updateCart)
 }
 
 type listCartRequest struct {

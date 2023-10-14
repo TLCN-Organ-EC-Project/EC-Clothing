@@ -13,6 +13,11 @@ INSERT INTO carts (
 SELECT * FROM carts
 WHERE id = $1 LIMIT 1;
 
+-- name: GetCartDetails :one
+SELECT * FROM carts
+WHERE username = $1 AND product_id = $2 AND size = $3
+LIMIT 1;
+
 -- name: ListCartOfUser :many
 SELECT * FROM carts
 WHERE username = $1
