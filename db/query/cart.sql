@@ -32,3 +32,6 @@ RETURNING *;
 
 -- name: DeleteCart :exec
 DELETE FROM carts WHERE id = $1;
+
+-- name: DeleteCartOfUser :exec
+DELETE FROM carts WHERE username = $1;

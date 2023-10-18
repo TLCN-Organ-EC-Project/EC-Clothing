@@ -105,6 +105,7 @@ func (server *Server) setupRouter() {
 	// carts
 	authUserRoutes.POST("/users/:username/carts", server.createCart)
 	authUserRoutes.GET("/users/:username/carts", server.listCartOfUser)
+	authUserRoutes.DELETE("/users/:username/carts", server.deleteCartOfUser)
 	authUserRoutes.PUT("/users/:username/carts/:cart_id", server.updateCart)
 	authUserRoutes.DELETE("/users/:username/carts/:cart_id", server.deleteCart)
 

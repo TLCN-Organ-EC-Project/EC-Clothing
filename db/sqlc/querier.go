@@ -28,6 +28,7 @@ type Querier interface {
 	CreateStore(ctx context.Context, arg CreateStoreParams) (Store, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteCart(ctx context.Context, id int64) error
+	DeleteCartOfUser(ctx context.Context, username string) error
 	DeleteCategory(ctx context.Context, id int64) error
 	DeleteDescriptionProduct(ctx context.Context, productID int64) error
 	DeleteFeedback(ctx context.Context, id int64) error

@@ -379,3 +379,49 @@ func (server *Server) deleteCart(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, "Delete Cart Successfully")
 }
+
+// @Summary User Delete Carts Of User
+// @ID deleteCartOfUser
+// @Produce json
+// @Accept json
+// @Tags User
+// @Param username path string true "Username"
+// @Security bearerAuth
+// @Success 200 {string} successfully
+// @Failure 400 {string} error
+// @Failure 401 {string} error
+// @Failure 404 {string} error
+// @Failure 500 {string} error
+// @Router /api/users/{username}/carts [delete]
+func (server *Server) deleteCartOfUser(ctx *gin.Context) {
+	var req getUserRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUser(ctx, req.Username)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if user.Username != authPayload.Username {
+		err := errors.New("user doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	err = server.store.DeleteCartOfUser(ctx, user.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, "Delete Cart Of User Successfully")
+}

@@ -58,6 +58,15 @@ func (q *Queries) DeleteCart(ctx context.Context, id int64) error {
 	return err
 }
 
+const deleteCartOfUser = `-- name: DeleteCartOfUser :exec
+DELETE FROM carts WHERE username = $1
+`
+
+func (q *Queries) DeleteCartOfUser(ctx context.Context, username string) error {
+	_, err := q.db.ExecContext(ctx, deleteCartOfUser, username)
+	return err
+}
+
 const getCart = `-- name: GetCart :one
 SELECT id, username, product_id, quantity, price, size FROM carts
 WHERE id = $1 LIMIT 1

@@ -2180,6 +2180,44 @@ paths:
       tags:
       - User
   /api/users/{username}/carts:
+    delete:
+      consumes:
+      - application/json
+      operationId: deleteCartOfUser
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Delete Carts Of User
+      tags:
+      - User
     get:
       consumes:
       - application/json
