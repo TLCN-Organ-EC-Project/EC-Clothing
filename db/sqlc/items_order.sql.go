@@ -123,15 +123,15 @@ func (q *Queries) ListItemsOrderByBookingID(ctx context.Context, bookingID strin
 }
 
 const statisticsProduct = `-- name: StatisticsProduct :many
-SELECT product_id, COUNT(*) AS quantity
+SELECT product_id, SUM(quantity) AS sold
 FROM items_order
 GROUP BY product_id
-LIMIT 10
+ORDER BY sold DESC
 `
 
 type StatisticsProductRow struct {
 	ProductID int64 `json:"product_id"`
-	Quantity  int64 `json:"quantity"`
+	Sold      int64 `json:"sold"`
 }
 
 func (q *Queries) StatisticsProduct(ctx context.Context) ([]StatisticsProductRow, error) {
@@ -143,7 +143,7 @@ func (q *Queries) StatisticsProduct(ctx context.Context) ([]StatisticsProductRow
 	items := []StatisticsProductRow{}
 	for rows.Next() {
 		var i StatisticsProductRow
-		if err := rows.Scan(&i.ProductID, &i.Quantity); err != nil {
+		if err := rows.Scan(&i.ProductID, &i.Sold); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
