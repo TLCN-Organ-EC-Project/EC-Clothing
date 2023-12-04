@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createOrder = `-- name: CreateOrder :one
@@ -75,6 +76,37 @@ WHERE booking_id = $1 LIMIT 1
 
 func (q *Queries) GetOrder(ctx context.Context, bookingID string) (Order, error) {
 	row := q.db.QueryRowContext(ctx, getOrder, bookingID)
+	var i Order
+	err := row.Scan(
+		&i.BookingID,
+		&i.UserBooking,
+		&i.PromotionID,
+		&i.Status,
+		&i.BookingDate,
+		&i.Address,
+		&i.Province,
+		&i.Tax,
+		&i.Amount,
+		&i.PaymentMethod,
+	)
+	return i, err
+}
+
+const getOrderByDate = `-- name: GetOrderByDate :one
+SELECT booking_id, user_booking, promotion_id, status, booking_date, address, province, tax, amount, payment_method FROM orders
+WHERE (
+booking_date BETWEEN $1 AND $2
+AND status = $3) LIMIT 1
+`
+
+type GetOrderByDateParams struct {
+	BookingDate   time.Time `json:"booking_date"`
+	BookingDate_2 time.Time `json:"booking_date_2"`
+	Status        string    `json:"status"`
+}
+
+func (q *Queries) GetOrderByDate(ctx context.Context, arg GetOrderByDateParams) (Order, error) {
+	row := q.db.QueryRowContext(ctx, getOrderByDate, arg.BookingDate, arg.BookingDate_2, arg.Status)
 	var i Order
 	err := row.Scan(
 		&i.BookingID,
@@ -183,6 +215,27 @@ func (q *Queries) ListOrderByUser(ctx context.Context, arg ListOrderByUserParams
 		return nil, err
 	}
 	return items, nil
+}
+
+const totalIncome = `-- name: TotalIncome :one
+SELECT CAST(SUM(amount) AS FLOAT) AS TotalIncome
+FROM orders  
+WHERE (
+booking_date BETWEEN $1 AND $2
+AND status = $3)
+`
+
+type TotalIncomeParams struct {
+	BookingDate   time.Time `json:"booking_date"`
+	BookingDate_2 time.Time `json:"booking_date_2"`
+	Status        string    `json:"status"`
+}
+
+func (q *Queries) TotalIncome(ctx context.Context, arg TotalIncomeParams) (float64, error) {
+	row := q.db.QueryRowContext(ctx, totalIncome, arg.BookingDate, arg.BookingDate_2, arg.Status)
+	var totalincome float64
+	err := row.Scan(&totalincome)
+	return totalincome, err
 }
 
 const updateAmountOfOrder = `-- name: UpdateAmountOfOrder :one

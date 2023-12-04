@@ -152,6 +152,11 @@ func (server *Server) setupRouter() {
 	authAdminRoutes.GET("/orders/:booking_id/detail", server.adminGetDetailOrderByBookingID)
 	// Province
 	authAdminRoutes.POST("/provinces", server.createProvinces)
+	// Revenue
+	authAdminRoutes.GET("/income/monthly", server.getTotalIncomeMonthly)
+	authAdminRoutes.GET("/income/yearly", server.getTotalIncomeYearly)
+	authAdminRoutes.GET("/statistics_product", server.getStatisticsProduct)
+
 	server.router = router
 }
 

@@ -18,6 +18,12 @@ SELECT * FROM items_order
 WHERE booking_id = $1
 ORDER BY id;
 
+-- name: StatisticsProduct :many
+SELECT product_id, COUNT(*) AS quantity
+FROM items_order
+GROUP BY product_id
+LIMIT 10;
+
 -- name: DeleteItemsOrder :exec
 DELETE FROM items_order WHERE id = $1;
 

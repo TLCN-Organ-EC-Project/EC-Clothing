@@ -40,5 +40,18 @@ SET amount = $2
 WHERE booking_id = $1
 RETURNING *;
 
+-- name: TotalIncome :one
+SELECT CAST(SUM(amount) AS FLOAT) AS TotalIncome
+FROM orders  
+WHERE (
+booking_date BETWEEN $1 AND $2
+AND status = $3);
+
+-- name: GetOrderByDate :one
+SELECT * FROM orders
+WHERE (
+booking_date BETWEEN $1 AND $2
+AND status = $3) LIMIT 1;
+
 -- name: DeleteOrder :exec
 DELETE FROM orders WHERE booking_id = $1;

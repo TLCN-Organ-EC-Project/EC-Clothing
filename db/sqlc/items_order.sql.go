@@ -121,3 +121,38 @@ func (q *Queries) ListItemsOrderByBookingID(ctx context.Context, bookingID strin
 	}
 	return items, nil
 }
+
+const statisticsProduct = `-- name: StatisticsProduct :many
+SELECT product_id, COUNT(*) AS quantity
+FROM items_order
+GROUP BY product_id
+LIMIT 10
+`
+
+type StatisticsProductRow struct {
+	ProductID int64 `json:"product_id"`
+	Quantity  int64 `json:"quantity"`
+}
+
+func (q *Queries) StatisticsProduct(ctx context.Context) ([]StatisticsProductRow, error) {
+	rows, err := q.db.QueryContext(ctx, statisticsProduct)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []StatisticsProductRow{}
+	for rows.Next() {
+		var i StatisticsProductRow
+		if err := rows.Scan(&i.ProductID, &i.Quantity); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -566,6 +566,13 @@ definitions:
       name:
         type: string
     type: object
+  db.StatisticsProductRow:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
   db.Store:
     properties:
       id:
@@ -815,6 +822,82 @@ paths:
       summary: Admin Delete Products In Category
       tags:
       - Admin
+  /api/admin/income/monthly:
+    get:
+      consumes:
+      - application/json
+      operationId: getTotalIncomeMonthly
+      parameters:
+      - in: query
+        maximum: 12
+        minimum: 1
+        name: month
+        required: true
+        type: integer
+      - in: query
+        minimum: 2023
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: float
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Get Income Monthly
+      tags:
+      - Revenue/Admin
+  /api/admin/income/yearly:
+    get:
+      consumes:
+      - application/json
+      operationId: getTotalIncomeYearly
+      parameters:
+      - in: query
+        minimum: 2023
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: float
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Get Income Yearly
+      tags:
+      - Revenue/Admin
   /api/admin/orders:
     get:
       consumes:
@@ -1308,6 +1391,35 @@ paths:
       summary: Admin Update Promotion
       tags:
       - Admin
+  /api/admin/statistics_product:
+    get:
+      consumes:
+      - application/json
+      operationId: getStatisticsProduct
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.StatisticsProductRow'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Get Statistics Product
+      tags:
+      - Revenue/Admin
   /api/admin/users/:
     get:
       consumes:
