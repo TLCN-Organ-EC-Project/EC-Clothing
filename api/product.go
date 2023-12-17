@@ -86,7 +86,7 @@ func (server *Server) adminCreateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-type getProductByNameResponse struct {
+type getProductByIDResponse struct {
 	Product []struct {
 		db.Product             `json:"product"`
 		db.DescriptionsProduct `json:"descriptions_product"`
@@ -103,13 +103,13 @@ type getProductByNameResponse struct {
 // @Param data query listFeedbackRequest true "listFeedbackRequest data"
 // @Param id path string true "ID"
 // @Tags Started
-// @Success 200 {object} getProductByNameResponse
+// @Success 200 {object} getProductByIDResponse
 // @Failure 400 {string} error
 // @Failure 403 {string} error
 // @Failure 500 {string} error
 // @Router /api/products/{id} [get]
 func (server *Server) getProductByID(ctx *gin.Context) {
-	var result getProductByNameResponse
+	var result getProductByIDResponse
 	var resultFeedbacks listFeedbackResponse
 	var reqList listFeedbackRequest
 	if err := ctx.ShouldBindQuery(&reqList); err != nil {
@@ -187,7 +187,7 @@ func (server *Server) getProductByID(ctx *gin.Context) {
 
 type listProductRequest struct {
 	PageID   int32 `form:"page_id" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=10,max=20"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=20"`
 }
 
 // @Summary List Product
@@ -319,7 +319,7 @@ func (server *Server) adminUpdateProduct(ctx *gin.Context) {
 type findProductRequest struct {
 	Keyword  string `form:"keyword" binding:"required"`
 	PageID   int32  `form:"page_id" binding:"required,min=1"`
-	PageSize int32  `form:"page_size" binding:"required,min=10,max=20"`
+	PageSize int32  `form:"page_size" binding:"required,min=5,max=20"`
 }
 
 // @Summary Find Product
