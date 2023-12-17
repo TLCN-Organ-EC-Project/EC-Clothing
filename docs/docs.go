@@ -1708,7 +1708,7 @@ const docTemplate = `{
                     },
                     {
                         "maximum": 20,
-                        "minimum": 10,
+                        "minimum": 5,
                         "type": "integer",
                         "name": "page_size",
                         "in": "query",
@@ -1886,7 +1886,7 @@ const docTemplate = `{
                     },
                     {
                         "maximum": 20,
-                        "minimum": 10,
+                        "minimum": 5,
                         "type": "integer",
                         "name": "page_size",
                         "in": "query",
@@ -1953,7 +1953,7 @@ const docTemplate = `{
                     },
                     {
                         "maximum": 20,
-                        "minimum": 10,
+                        "minimum": 5,
                         "type": "integer",
                         "name": "page_size",
                         "in": "query",
@@ -2032,7 +2032,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.getProductByNameResponse"
+                            "$ref": "#/definitions/api.getProductByIDResponse"
                         }
                     },
                     "400": {
@@ -4046,7 +4046,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.getProductByNameResponse": {
+        "api.getProductByIDResponse": {
             "type": "object",
             "properties": {
                 "product": {
@@ -4604,7 +4604,7 @@ const docTemplate = `{
                 "product_id": {
                     "type": "integer"
                 },
-                "quantity": {
+                "sold": {
                     "type": "integer"
                 }
             }

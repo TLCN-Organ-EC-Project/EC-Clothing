@@ -200,7 +200,7 @@ definitions:
     - email
     - username
     type: object
-  api.getProductByNameResponse:
+  api.getProductByIDResponse:
     properties:
       product:
         items:
@@ -570,7 +570,7 @@ definitions:
     properties:
       product_id:
         type: integer
-      quantity:
+      sold:
         type: integer
     type: object
   db.Store:
@@ -1702,7 +1702,7 @@ paths:
         type: integer
       - in: query
         maximum: 20
-        minimum: 10
+        minimum: 5
         name: page_size
         required: true
         type: integer
@@ -1820,7 +1820,7 @@ paths:
         type: integer
       - in: query
         maximum: 20
-        minimum: 10
+        minimum: 5
         name: page_size
         required: true
         type: integer
@@ -1876,7 +1876,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.getProductByNameResponse'
+            $ref: '#/definitions/api.getProductByIDResponse'
         "400":
           description: Bad Request
           schema:
@@ -1953,7 +1953,7 @@ paths:
         type: integer
       - in: query
         maximum: 20
-        minimum: 10
+        minimum: 5
         name: page_size
         required: true
         type: integer

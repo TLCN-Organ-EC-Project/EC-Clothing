@@ -1699,7 +1699,7 @@
                     },
                     {
                         "maximum": 20,
-                        "minimum": 10,
+                        "minimum": 5,
                         "type": "integer",
                         "name": "page_size",
                         "in": "query",
@@ -1877,7 +1877,7 @@
                     },
                     {
                         "maximum": 20,
-                        "minimum": 10,
+                        "minimum": 5,
                         "type": "integer",
                         "name": "page_size",
                         "in": "query",
@@ -1944,7 +1944,7 @@
                     },
                     {
                         "maximum": 20,
-                        "minimum": 10,
+                        "minimum": 5,
                         "type": "integer",
                         "name": "page_size",
                         "in": "query",
@@ -2023,7 +2023,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.getProductByNameResponse"
+                            "$ref": "#/definitions/api.getProductByIDResponse"
                         }
                     },
                     "400": {
@@ -4037,7 +4037,7 @@
                 }
             }
         },
-        "api.getProductByNameResponse": {
+        "api.getProductByIDResponse": {
             "type": "object",
             "properties": {
                 "product": {
@@ -4595,7 +4595,7 @@
                 "product_id": {
                     "type": "integer"
                 },
-                "quantity": {
+                "sold": {
                     "type": "integer"
                 }
             }
