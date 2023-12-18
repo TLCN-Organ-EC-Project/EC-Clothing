@@ -23,6 +23,7 @@ type createUserRequest struct {
 	FullName string `json:"full_name" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
 	Phone    string `json:"phone" binding:"required,e164"`
+	Role     string `json:"role" binding:"required"`
 	Address  string `json:"address" binding:"required"`
 	Province string `json:"province" binding:"required"`
 }
@@ -81,7 +82,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	role, err := server.store.GetRole(ctx, "Buyer")
+	role, err := server.store.GetRole(ctx, req.Role)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
