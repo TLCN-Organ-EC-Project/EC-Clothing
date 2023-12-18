@@ -176,6 +176,8 @@ definitions:
         type: string
       province:
         type: string
+      role:
+        type: string
       username:
         type: string
     required:
@@ -185,6 +187,7 @@ definitions:
     - password
     - phone
     - province
+    - role
     - username
     type: object
   api.forgotPasswordRequest:
