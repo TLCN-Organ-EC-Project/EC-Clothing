@@ -3990,7 +3990,7 @@
                 "full_name",
                 "password",
                 "phone",
-                "province",
+                "provider",
                 "role",
                 "username"
             ],
@@ -4011,7 +4011,7 @@
                 "phone": {
                     "type": "string"
                 },
-                "province": {
+                "provider": {
                     "type": "string"
                 },
                 "role": {

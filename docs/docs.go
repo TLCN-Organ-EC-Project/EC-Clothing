@@ -3999,7 +3999,7 @@ const docTemplate = `{
                 "full_name",
                 "password",
                 "phone",
-                "province",
+                "provider",
                 "role",
                 "username"
             ],
@@ -4020,7 +4020,7 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
-                "province": {
+                "provider": {
                     "type": "string"
                 },
                 "role": {

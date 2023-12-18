@@ -25,7 +25,7 @@ type createUserRequest struct {
 	Phone    string `json:"phone" binding:"required,e164"`
 	Role     string `json:"role" binding:"required"`
 	Address  string `json:"address" binding:"required"`
-	Province string `json:"province" binding:"required"`
+	Province string `json:"provider" binding:"required"`
 }
 
 // swagger:response userResponse

@@ -174,7 +174,7 @@ definitions:
         type: string
       phone:
         type: string
-      province:
+      provider:
         type: string
       role:
         type: string
@@ -186,7 +186,7 @@ definitions:
     - full_name
     - password
     - phone
-    - province
+    - provider
     - role
     - username
     type: object
