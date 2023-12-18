@@ -4000,7 +4000,6 @@ const docTemplate = `{
                 "password",
                 "phone",
                 "province",
-                "role",
                 "username"
             ],
             "properties": {
@@ -4021,9 +4020,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "province": {
-                    "type": "string"
-                },
-                "role": {
                     "type": "string"
                 },
                 "username": {
