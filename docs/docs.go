@@ -1387,6 +1387,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/admin/stores": {
+            "get": {
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Admin Get Store",
+                "operationId": "getStore",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.ProductInStore"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/users/": {
             "get": {
                 "security": [
@@ -3925,6 +3977,48 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.ProductInStore": {
+            "type": "object",
+            "properties": {
+                "stores": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "price": {
+                                "type": "number"
+                            },
+                            "product_name": {
+                                "type": "string"
+                            },
+                            "store": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/api.StoreRes"
+                                }
+                            },
+                            "thumb": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "api.StoreRes": {
+            "type": "object",
+            "properties": {
+                "quantity": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "string"
+                }
+            }
+        },
         "api.addImageProductRequest": {
             "type": "object",
             "required": [

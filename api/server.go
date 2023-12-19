@@ -143,6 +143,7 @@ func (server *Server) setupRouter() {
 	// Add Product to Store
 	authAdminRoutes.POST("/products/:id/store", server.adminAddProductToStore)
 	authAdminRoutes.PUT("/products/:id/store", server.adminUpdateProductToStore)
+	authAdminRoutes.GET("/stores", server.getStore)
 
 	// Order
 	authAdminRoutes.GET("/orders", server.adminListOrder)

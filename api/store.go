@@ -132,38 +132,66 @@ func (server *Server) adminUpdateProductToStore(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, storeProduct)
 }
 
-// type ProductInStore struct {
-// 	Stores []struct {
-// 		Product db.Product `json:"product"`
-// 		Store []db.Store `json:"store"`
-// 	} `json:"stores"`
-// }
+type StoreRes struct {
+	Size     string `json:"size"`
+	Quantity int32  `json:"quantity"`
+}
 
-// // @Summary Admin Get Store
-// // @ID getStore
-// // @Produce json
-// // @Accept json
-// // @Security bearerAuth
-// // @Tags Admin
-// // @Success 200 {object} db.Order
-// // @Failure 400 {string} error
-// // @Failure 401 {string} error
-// // @Failure 404 {string} error
-// // @Failure 500 {string} error
-// // @Router 
-// func (server *Server) getStore(ctx *gin.Context) {
+func storeResponse(store db.Store) StoreRes {
+	return StoreRes{
+		Size: store.Size,
+		Quantity: store.Quantity,
+	}
+}
 
-// 	products, err := server.store.ListProductsNoLimit(ctx)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-// 		return
-// 	}
+type ProductInStore struct {
+	Stores []struct {
+		ID          int64      `json:"id"`
+		ProductName string     `json:"product_name"`
+		Thumb       string     `json:"thumb"`
+		Price       float64    `json:"price"`
+		Store       []StoreRes `json:"store"`
+	} `json:"stores"`
+}
 
-// 	order, err := server.store.GetOrder(ctx, req.BookingID)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-// 		return
-// 	}
+// @Summary Admin Get Store
+// @ID getStore
+// @Produce json
+// @Accept json
+// @Security bearerAuth
+// @Tags Admin
+// @Success 200 {object} ProductInStore
+// @Failure 400 {string} error
+// @Failure 401 {string} error
+// @Failure 404 {string} error
+// @Failure 500 {string} error
+// @Router /api/admin/stores [get]
+func (server *Server) getStore(ctx *gin.Context) {
+	var result ProductInStore
 
-// 	ctx.JSON(http.StatusOK, order)
-// }
+	products, err := server.store.ListProductsNoLimit(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	for _, product := range products {
+		listStores, err := server.store.ListStore(ctx, product.ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		var store []StoreRes
+		for _, listStore := range listStores {
+			store = append(store, storeResponse(listStore))
+		}
+		result.Stores = append(result.Stores, struct {
+			ID int64 "json:\"id\""; 
+			ProductName string "json:\"product_name\""; 
+			Thumb string "json:\"thumb\""; 
+			Price float64 "json:\"price\""; 
+			Store []StoreRes "json:\"store\""
+		}{product.ID, product.ProductName, product.Thumb, product.Price, store})
+	}
+	ctx.JSON(http.StatusOK, result)
+}

@@ -1,4 +1,31 @@
 definitions:
+  api.ProductInStore:
+    properties:
+      stores:
+        items:
+          properties:
+            id:
+              type: integer
+            price:
+              type: number
+            product_name:
+              type: string
+            store:
+              items:
+                $ref: '#/definitions/api.StoreRes'
+              type: array
+            thumb:
+              type: string
+          type: object
+        type: array
+    type: object
+  api.StoreRes:
+    properties:
+      quantity:
+        type: integer
+      size:
+        type: string
+    type: object
   api.addImageProductRequest:
     properties:
       images:
@@ -1494,6 +1521,39 @@ paths:
       summary: Admin Get Statistics Product
       tags:
       - Revenue/Admin
+  /api/admin/stores:
+    get:
+      consumes:
+      - application/json
+      operationId: getStore
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.ProductInStore'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Get Store
+      tags:
+      - Admin
   /api/admin/users/:
     get:
       consumes:
