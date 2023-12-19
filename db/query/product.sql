@@ -30,6 +30,10 @@ ORDER BY product_name
 LIMIT $1
 OFFSET $2;
 
+-- name: ListProductsNoLimit :many
+SELECT * FROM products
+ORDER BY product_name;
+
 -- name: UpdateProduct :one
 UPDATE products
 SET product_name = $2, thumb = $3, price = $4

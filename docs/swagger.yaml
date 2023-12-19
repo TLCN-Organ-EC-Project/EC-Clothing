@@ -822,6 +822,41 @@ paths:
       summary: Admin Delete Products In Category
       tags:
       - Admin
+  /api/admin/confirm_orders:
+    get:
+      consumes:
+      - application/json
+      operationId: adminListConfirmOrder
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Order'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Get List Confirm Order
+      tags:
+      - Admin
   /api/admin/income/monthly:
     get:
       consumes:
@@ -1666,6 +1701,41 @@ paths:
       security:
       - bearerAuth: []
       summary: Admin Delete Feedback
+      tags:
+      - Admin
+  /api/admin/validated_orders:
+    get:
+      consumes:
+      - application/json
+      operationId: adminListValidatedOrder
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Order'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: Admin Get List Validated Order
       tags:
       - Admin
   /api/categories:

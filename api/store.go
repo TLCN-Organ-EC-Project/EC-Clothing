@@ -131,3 +131,39 @@ func (server *Server) adminUpdateProductToStore(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, storeProduct)
 }
+
+// type ProductInStore struct {
+// 	Stores []struct {
+// 		Product db.Product `json:"product"`
+// 		Store []db.Store `json:"store"`
+// 	} `json:"stores"`
+// }
+
+// // @Summary Admin Get Store
+// // @ID getStore
+// // @Produce json
+// // @Accept json
+// // @Security bearerAuth
+// // @Tags Admin
+// // @Success 200 {object} db.Order
+// // @Failure 400 {string} error
+// // @Failure 401 {string} error
+// // @Failure 404 {string} error
+// // @Failure 500 {string} error
+// // @Router 
+// func (server *Server) getStore(ctx *gin.Context) {
+
+// 	products, err := server.store.ListProductsNoLimit(ctx)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+// 		return
+// 	}
+
+// 	order, err := server.store.GetOrder(ctx, req.BookingID)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+// 		return
+// 	}
+
+// 	ctx.JSON(http.StatusOK, order)
+// }

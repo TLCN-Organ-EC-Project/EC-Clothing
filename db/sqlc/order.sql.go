@@ -217,6 +217,46 @@ func (q *Queries) ListOrderByUser(ctx context.Context, arg ListOrderByUserParams
 	return items, nil
 }
 
+const listValidatedOrder = `-- name: ListValidatedOrder :many
+SELECT booking_id, user_booking, promotion_id, status, booking_date, address, province, tax, amount, payment_method FROM orders
+WHERE status = $1
+ORDER BY booking_date
+`
+
+func (q *Queries) ListValidatedOrder(ctx context.Context, status string) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, listValidatedOrder, status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Order{}
+	for rows.Next() {
+		var i Order
+		if err := rows.Scan(
+			&i.BookingID,
+			&i.UserBooking,
+			&i.PromotionID,
+			&i.Status,
+			&i.BookingDate,
+			&i.Address,
+			&i.Province,
+			&i.Tax,
+			&i.Amount,
+			&i.PaymentMethod,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const totalIncome = `-- name: TotalIncome :one
 SELECT CAST(SUM(amount) AS FLOAT) AS TotalIncome
 FROM orders  

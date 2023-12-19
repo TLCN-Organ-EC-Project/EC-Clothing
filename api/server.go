@@ -149,6 +149,8 @@ func (server *Server) setupRouter() {
 	authAdminRoutes.GET("/orders/:booking_id", server.adminGetOrderByBookingID)
 	authAdminRoutes.GET("/orders/users/:username", server.adminListOrderByUser)
 	authAdminRoutes.PUT("/orders/:booking_id/confirm", server.confirmOrder)
+	authAdminRoutes.GET("/validated_orders", server.adminListValidatedOrder)
+	authAdminRoutes.GET("/confirm_orders", server.adminListConfirmOrder)
 
 	// Order Detail
 	authAdminRoutes.GET("/orders/:booking_id/detail", server.adminGetDetailOrderByBookingID)

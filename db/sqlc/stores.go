@@ -353,7 +353,7 @@ func (store *SQLStore) OrderTx(ctx context.Context, arg OrderTxParams) (OrderTxR
 
 		}
 
-		amount = (amount + order.Tax*amount) * (1 - discount)
+		amount = (amount) * (1 - discount)
 
 		result.Order, err = q.UpdateAmountOfOrder(ctx, UpdateAmountOfOrderParams{
 			BookingID: order.BookingID,

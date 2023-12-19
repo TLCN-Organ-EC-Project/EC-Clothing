@@ -152,6 +152,39 @@ func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]P
 	return items, nil
 }
 
+const listProductsNoLimit = `-- name: ListProductsNoLimit :many
+SELECT id, product_name, thumb, price FROM products
+ORDER BY product_name
+`
+
+func (q *Queries) ListProductsNoLimit(ctx context.Context) ([]Product, error) {
+	rows, err := q.db.QueryContext(ctx, listProductsNoLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Product{}
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProductName,
+			&i.Thumb,
+			&i.Price,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateProduct = `-- name: UpdateProduct :one
 UPDATE products
 SET product_name = $2, thumb = $3, price = $4

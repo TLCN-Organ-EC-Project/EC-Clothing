@@ -503,3 +503,45 @@ func (server *Server) confirmOrder(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+// @Summary Admin Get List Validated Order
+// @ID adminListValidatedOrder
+// @Produce json
+// @Accept json
+// @Security bearerAuth
+// @Tags Admin
+// @Success 200 {object} []db.Order
+// @Failure 400 {string} error
+// @Failure 401 {string} error
+// @Failure 404 {string} error
+// @Failure 500 {string} error
+// @Router /api/admin/validated_orders [get]
+func (server *Server) adminListValidatedOrder(ctx *gin.Context) {
+	listOrders, err := server.store.ListValidatedOrder(ctx, "validated")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, listOrders)
+}
+
+// @Summary Admin Get List Confirm Order
+// @ID adminListConfirmOrder
+// @Produce json
+// @Accept json
+// @Security bearerAuth
+// @Tags Admin
+// @Success 200 {object} []db.Order
+// @Failure 400 {string} error
+// @Failure 401 {string} error
+// @Failure 404 {string} error
+// @Failure 500 {string} error
+// @Router /api/admin/confirm_orders [get]
+func (server *Server) adminListConfirmOrder(ctx *gin.Context) {
+	listOrders, err := server.store.ListValidatedOrder(ctx, "confirm")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, listOrders)
+}

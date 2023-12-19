@@ -59,5 +59,11 @@ WHERE (
 booking_date BETWEEN $1 AND $2
 AND status = $3) LIMIT 1;
 
+-- name: ListValidatedOrder :many
+SELECT * FROM orders
+WHERE status = $1
+ORDER BY booking_date;
+
+
 -- name: DeleteOrder :exec
 DELETE FROM orders WHERE booking_id = $1;
