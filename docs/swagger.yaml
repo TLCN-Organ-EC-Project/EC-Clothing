@@ -2218,9 +2218,8 @@ paths:
     post:
       operationId: renewAccessToken
       parameters:
-      - description: X-Refresh-Token
-        in: header
-        name: X-Refresh-Token
+      - in: query
+        name: refresh_token
         required: true
         type: string
       responses:

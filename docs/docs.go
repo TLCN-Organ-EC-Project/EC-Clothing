@@ -2492,9 +2492,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "X-Refresh-Token",
-                        "name": "X-Refresh-Token",
-                        "in": "header",
+                        "name": "refresh_token",
+                        "in": "query",
                         "required": true
                     }
                 ],

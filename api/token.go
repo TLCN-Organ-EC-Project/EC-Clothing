@@ -9,9 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type renewAccessTokenRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
 // @Summary Renew Access Token
 // @ID renewAccessToken
-// @Param X-Refresh-Token header string true "X-Refresh-Token"
+// @Param data query renewAccessTokenRequest true "renewAccessTokenRequest data"
 // @Tags Auth
 // @Success 200 {string} succesfully
 // @Failure 401 {string} error
@@ -20,11 +24,14 @@ import (
 // @Failure 500 {string} error
 // @Router /api/tokens/renew_access [post]
 func (server *Server) renewAccessToken(ctx *gin.Context) {
-	// Get the refresh token from the header
-	refreshToken := ctx.Request.Header.Get("X-Refresh-Token")
+	var req renewAccessTokenRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
 	// Validate the refresh token
-	refreshPayload, err := server.tokenMaker.VerifyToken(refreshToken)
+	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
@@ -53,7 +60,7 @@ func (server *Server) renewAccessToken(ctx *gin.Context) {
 		return
 	}
 
-	if session.RefreshToken != refreshToken {
+	if session.RefreshToken != req.RefreshToken {
 		err := fmt.Errorf("mismatched session token")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
