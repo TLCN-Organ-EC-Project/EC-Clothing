@@ -15,10 +15,21 @@ type getOrderRequest struct {
 	BookingID string `uri:"booking_id" binding:"required"`
 }
 
+type ProductOrdered struct {
+	ID           int64   `json:"id"`
+	BookingID    string  `json:"booking_id"`
+	ProductID    int64   `json:"product_id"`
+	ProductName  string  `json:"product_name"`
+	ProductThumb string  `json:"product_thumb"`
+	Quantity     int32   `json:"quantity"`
+	Price        float64 `json:"price"`
+	Size         string  `json:"size"`
+}
+
 type OrderTxResult struct {
-	Order          db.Order        `json:"order"`
-	UserOrder      userResponse    `json:"user_order"`
-	ProductOrdered []db.ItemsOrder `json:"product_ordered"`
+	Order          db.Order         `json:"order"`
+	UserOrder      userResponse     `json:"user_order"`
+	ProductOrdered []ProductOrdered `json:"product_ordered"`
 }
 
 // @Summary User Get Detail Order By Booking ID
@@ -74,8 +85,28 @@ func (server *Server) getDetailOrderByBookingID(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	result.ProductOrdered = itemsOrder
-
+	for _, item := range itemsOrder {
+		product, err := server.store.GetProduct(ctx, item.ProductID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		productOrdered := ProductOrdered{
+			ID:          item.ID,
+			BookingID:   item.BookingID,
+			ProductID:   item.ProductID,
+			ProductName: product.ProductName,
+			ProductThumb: product.Thumb,
+			Quantity: item.Quantity,
+			Price: item.Price,
+			Size: item.Size,
+		}
+		result.ProductOrdered = append(result.ProductOrdered, productOrdered)
+	}
 	ctx.JSON(http.StatusOK, result)
 }
 
@@ -128,7 +159,28 @@ func (server *Server) adminGetDetailOrderByBookingID(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	result.ProductOrdered = itemsOrder
+	for _, item := range itemsOrder {
+		product, err := server.store.GetProduct(ctx, item.ProductID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		productOrdered := ProductOrdered{
+			ID:          item.ID,
+			BookingID:   item.BookingID,
+			ProductID:   item.ProductID,
+			ProductName: product.ProductName,
+			ProductThumb: product.Thumb,
+			Quantity: item.Quantity,
+			Price: item.Price,
+			Size: item.Size,
+		}
+		result.ProductOrdered = append(result.ProductOrdered, productOrdered)
+	}
 
 	ctx.JSON(http.StatusOK, result)
 }

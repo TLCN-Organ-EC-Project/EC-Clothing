@@ -984,6 +984,45 @@ paths:
       summary: Admin Get Order By Booking ID
       tags:
       - Admin
+  /api/admin/orders/{booking_id}/confirm:
+    put:
+      consumes:
+      - application/json
+      operationId: confirmOrder
+      parameters:
+      - description: BookingID
+        in: path
+        name: booking_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - bearerAuth: []
+      summary: User Confirm Order
+      tags:
+      - Admin
   /api/admin/orders/{booking_id}/detail:
     get:
       consumes:

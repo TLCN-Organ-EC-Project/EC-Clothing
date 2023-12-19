@@ -89,6 +89,7 @@ type Querier interface {
 	UpdateProductsInCategory(ctx context.Context, arg UpdateProductsInCategoryParams) (ProductsInCategory, error)
 	UpdatePromotion(ctx context.Context, arg UpdatePromotionParams) (Promotion, error)
 	UpdateResetPasswordToken(ctx context.Context, arg UpdateResetPasswordTokenParams) (User, error)
+	UpdateStatusOrder(ctx context.Context, arg UpdateStatusOrderParams) (Order, error)
 	UpdateStore(ctx context.Context, arg UpdateStoreParams) (Store, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }

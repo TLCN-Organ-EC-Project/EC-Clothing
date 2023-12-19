@@ -460,3 +460,46 @@ func (server *Server) cancelOrder(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+// @Summary User Confirm Order
+// @ID confirmOrder
+// @Produce json
+// @Accept json
+// @Param booking_id path string true "BookingID"
+// @Security bearerAuth
+// @Tags Admin
+// @Success 200 {string} db.Order
+// @Failure 400 {string} error
+// @Failure 401 {string} error
+// @Failure 404 {string} error
+// @Failure 500 {string} error
+// @Router /api/admin/orders/{booking_id}/confirm [put]
+func (server *Server) confirmOrder(ctx *gin.Context) {
+	var req adminGetOrderRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	order, err := server.store.GetOrder(ctx, req.BookingID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateStatusOrderParams {
+		BookingID: order.BookingID,
+		Status: "confirm",
+	}
+
+	rsp, err := server.store.UpdateStatusOrder(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}

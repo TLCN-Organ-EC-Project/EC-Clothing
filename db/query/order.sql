@@ -34,6 +34,12 @@ SET address = $2, province = $3
 WHERE booking_id = $1
 RETURNING *;
 
+-- name: UpdateStatusOrder :one
+UPDATE orders
+SET status = $2
+WHERE booking_id = $1
+RETURNING *;
+
 -- name: UpdateAmountOfOrder :one
 UPDATE orders
 SET amount = $2

@@ -148,6 +148,8 @@ func (server *Server) setupRouter() {
 	authAdminRoutes.GET("/orders", server.adminListOrder)
 	authAdminRoutes.GET("/orders/:booking_id", server.adminGetOrderByBookingID)
 	authAdminRoutes.GET("/orders/users/:username", server.adminListOrderByUser)
+	authAdminRoutes.PUT("/orders/:booking_id/confirm", server.confirmOrder)
+
 	// Order Detail
 	authAdminRoutes.GET("/orders/:booking_id/detail", server.adminGetDetailOrderByBookingID)
 	// Province
