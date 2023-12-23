@@ -63,6 +63,7 @@ type CreateProductTxParams struct {
 }
 
 type CreateProductTxResults struct {
+	ID          int64   `json:"id"`
 	ProductName string  `json:"product_name"`
 	Thumb       string  `json:"thumb"`
 	Price       float64 `json:"price"`
@@ -155,6 +156,7 @@ func (store *SQLStore) CreateProductTx(ctx context.Context, arg CreateProductTxP
 		}
 
 		rsp := CreateProductTxResults{
+			ID:          product.ID,
 			ProductName: product.ProductName,
 			Thumb:       product.Thumb,
 			Price:       product.Price,

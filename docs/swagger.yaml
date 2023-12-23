@@ -160,6 +160,8 @@ definitions:
     properties:
       gender:
         type: string
+      id:
+        type: integer
       material:
         type: string
       price:
@@ -449,6 +451,8 @@ definitions:
     properties:
       gender:
         type: string
+      id:
+        type: integer
       material:
         type: string
       price:

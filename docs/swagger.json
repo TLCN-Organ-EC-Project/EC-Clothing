@@ -4205,6 +4205,9 @@
                 "gender": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "material": {
                     "type": "string"
                 },
@@ -4632,6 +4635,9 @@
             "properties": {
                 "gender": {
                     "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "material": {
                     "type": "string"

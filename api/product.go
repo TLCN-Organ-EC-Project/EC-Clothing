@@ -28,6 +28,7 @@ type createProductRequest struct {
 }
 
 type createProductResponse struct {
+	ID          int64   `json:"id"`
 	ProductName string  `json:"product_name"`
 	Thumb       string  `json:"thumb"`
 	Price       float64 `json:"price"`
@@ -39,6 +40,7 @@ type createProductResponse struct {
 
 func newProductResponse(product db.Product, descriptionsProduct db.DescriptionsProduct) createProductResponse {
 	return createProductResponse{
+		ID:          product.ID,
 		ProductName: product.ProductName,
 		Thumb:       product.Thumb,
 		Price:       product.Price,
@@ -348,8 +350,8 @@ func (server *Server) findProduct(ctx *gin.Context) {
 
 	products, err := server.store.FindProduct(ctx, db.FindProductParams{
 		Column1: keywordNullString,
-		Limit:  req.PageSize,
-		Offset: (req.PageID - 1) * req.PageSize,
+		Limit:   req.PageSize,
+		Offset:  (req.PageID - 1) * req.PageSize,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))

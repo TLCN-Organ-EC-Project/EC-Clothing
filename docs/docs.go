@@ -4214,6 +4214,9 @@ const docTemplate = `{
                 "gender": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "material": {
                     "type": "string"
                 },
@@ -4641,6 +4644,9 @@ const docTemplate = `{
             "properties": {
                 "gender": {
                     "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "material": {
                     "type": "string"
