@@ -11,7 +11,7 @@ import (
 
 type addProductToStoreRequest struct {
 	Size     []string `json:"size" binding:"required"`
-	Quantity []int32  `json:"quantity" binding:"required,min=1"`
+	Quantity []int32  `json:"quantity" binding:"required"`
 }
 
 // @Summary Admin Add Product To Store
